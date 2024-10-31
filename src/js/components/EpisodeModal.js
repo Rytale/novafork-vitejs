@@ -49,31 +49,31 @@ export class EpisodeModal {
       );
 
       const content = `
-        <div class="relative bg-[#141414] text-white max-w-5xl w-full mx-4 rounded-lg overflow-hidden">
+        <div class="relative bg-[#141414] text-white w-full mx-auto rounded-lg overflow-hidden max-w-5xl sm:mx-4">
           <div class="flex justify-between items-center p-4 border-b border-gray-800">
-            <h2 class="text-2xl font-bold">Select Episode</h2>
+            <h2 class="text-xl sm:text-2xl font-bold">Select Episode</h2>
             <button id="closeModalBtn" class="text-gray-400 hover:text-white transition-colors">
               <i class="fas fa-times text-xl"></i>
             </button>
           </div>
 
-          <div class="flex h-[600px]">
+          <div class="flex flex-col sm:flex-row h-[calc(100vh-120px)] sm:h-[600px]">
             <!-- Seasons List -->
-            <div class="w-64 bg-[#1a1a1a] border-r border-gray-800 overflow-y-auto">
+            <div class="w-full sm:w-64 bg-[#1a1a1a] border-b sm:border-b-0 sm:border-r border-gray-800 overflow-x-auto sm:overflow-y-auto">
               <div class="p-4">
                 <h3 class="text-lg font-semibold mb-4">Seasons</h3>
-                <div class="space-y-2">
+                <div class="flex sm:flex-col gap-2 min-w-max sm:min-w-0">
                   ${seasons
                     .map(
                       (season) => `
                     <button 
-                      class="w-full text-left px-4 py-3 rounded ${
+                      class="flex-shrink-0 sm:flex-shrink text-left px-4 py-3 rounded ${
                         season.season_number === lastSeasonWatched
                           ? "bg-[#333333] text-white"
                           : "text-gray-400 hover:bg-[#262626]"
                       } transition-colors"
                       data-season="${season.season_number}">
-                      <div class="font-medium">Season ${
+                      <div class="font-medium whitespace-nowrap">Season ${
                         season.season_number
                       }</div>
                       <div class="text-sm text-gray-500">${
@@ -88,7 +88,7 @@ export class EpisodeModal {
             </div>
 
             <!-- Episodes List -->
-            <div class="flex-1 overflow-y-auto p-4" id="episodesList">
+            <div class="flex-1 overflow-y-auto p-2 sm:p-4" id="episodesList">
               ${this.generateEpisodesList(seasonDetails.episodes)}
             </div>
           </div>
@@ -144,7 +144,7 @@ export class EpisodeModal {
     if (!episodes || !episodes.length) return "";
 
     return `
-      <div class="grid gap-4">
+      <div class="grid gap-2 sm:gap-4">
         ${episodes
           .map((episode) => {
             const stillPath = episode.still_path
@@ -154,22 +154,22 @@ export class EpisodeModal {
             return `
             <div class="episode-item bg-[#1a1a1a] rounded-lg overflow-hidden hover:bg-[#262626] transition-colors cursor-pointer"
                  data-episode="${episode.episode_number}">
-              <div class="flex items-center p-4">
-                <div class="w-32 h-20 bg-gray-800 rounded overflow-hidden flex-shrink-0">
+              <div class="flex items-center p-2 sm:p-4">
+                <div class="w-24 sm:w-32 h-16 sm:h-20 bg-gray-800 rounded overflow-hidden flex-shrink-0">
                   <img src="${stillPath}" alt="Episode ${
               episode.episode_number
             }" class="w-full h-full object-cover">
                 </div>
-                <div class="ml-4 flex-1">
-                  <div class="flex justify-between items-start">
-                    <div class="text-lg font-medium">Episode ${
+                <div class="ml-3 sm:ml-4 flex-1 min-w-0">
+                  <div class="flex justify-between items-start gap-2">
+                    <div class="text-base sm:text-lg font-medium truncate">Episode ${
                       episode.episode_number
                     }: ${episode.name}</div>
-                    <div class="text-sm text-gray-400">${
+                    <div class="text-xs sm:text-sm text-gray-400 flex-shrink-0">${
                       episode.runtime || 0
                     } min</div>
                   </div>
-                  <p class="text-sm text-gray-400 mt-1 line-clamp-2">${
+                  <p class="text-xs sm:text-sm text-gray-400 mt-1 line-clamp-2">${
                     episode.overview || "No description available"
                   }</p>
                 </div>

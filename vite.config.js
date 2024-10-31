@@ -27,7 +27,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ["hls.js"],
           "media-player": [
             "./src/js/components/MediaPlayer.js",
             "./src/js/components/MediaDetails.js",
@@ -66,7 +65,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ["hls.js"],
+    include: [],
     exclude: [],
   },
   resolve: {

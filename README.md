@@ -1,18 +1,21 @@
-
-
 <p align="center">
   <strong>Nova</strong> – Your Gateway to Free Streaming
 </p>
 
 > **UPDATE ALERT**  
-> **NEW FEATURES AVAILABLE!**
+> **Completely rewritten in Vite.js for better performance and modern development experience!**
 
 # Nova ☄
 
 ## Overview
 
-Nova is a versatile streaming platform designed to bring you a diverse collection of movies right to your fingertips. Whether you're into the latest blockbusters or timeless classics, Nova has something for everyone.
+Nova is a versatile streaming platform designed to bring you a diverse collection of movies right to your fingertips. Whether you're into the latest blockbusters or timeless classics, Nova has something for everyone. The platform has been completely rewritten using Vite.js, offering improved performance, faster development experience, and better code organization.
 
+## Key Features
+
+- **Modern Tech Stack**: Built with Vite.js for lightning-fast development and optimal production builds
+- **Enhanced Performance**: Leverages Vite's native ESM-based dev server for quick hot module replacement
+- **Improved Build System**: Utilizes Vite's efficient build process for better code splitting and optimization
 
 ## Actively Maintained Fork
 
@@ -39,7 +42,7 @@ Explore Nova online with ease—no setup required. Just dive in and start watchi
 
 ## Hosting 🌐
 
-You’re welcome to host Nova on your own server! However, **please ensure you give proper credit** by linking to this repository or mentioning the original creators. This acknowledgment is required to use and share the site.
+You're welcome to host Nova on your own server! However, **please ensure you give proper credit** by linking to this repository or mentioning the original creators. This acknowledgment is required to use and share the site.
 
 ## Community & Support 💬
 
@@ -48,7 +51,7 @@ Join our Discord community to stay updated, give feedback, or ask for help:
 
 ## Contributing ❤
 
-Contributions are greatly appreciated! If you’d like to help improve Nova, feel free to submit a pull request.
+Contributions are greatly appreciated! If you'd like to help improve Nova, feel free to submit a pull request.
 
 #### Created with ❤ by ambr0sial and fanlim.
 

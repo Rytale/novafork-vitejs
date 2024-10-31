@@ -1,7 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./src/**/*.{html,js}",
+    "./src/**/*.{html,js,jsx,ts,tsx}",
+    "./src/js/**/*.{js,jsx,ts,tsx}",
+    "./src/js/components/**/*.{js,jsx,ts,tsx}",
     "./index.html"
   ],
   theme: {
@@ -39,7 +41,7 @@ export default {
     }
   },
   plugins: [
-    function({ addUtilities }) {
+    function({ addUtilities, addComponents }) {
       const newUtilities = {
         '.text-shadow': {
           'text-shadow': '0 2px 4px rgba(0,0,0,0.1)',
@@ -50,8 +52,26 @@ export default {
         '.text-shadow-lg': {
           'text-shadow': '0 15px 30px rgba(0,0,0,0.11), 0 5px 15px rgba(0,0,0,0.08)',
         },
-      }
-      addUtilities(newUtilities)
+      };
+      addUtilities(newUtilities);
+
+      // Add custom components
+      addComponents({
+        '.glassmorphism': {
+          'background': 'rgba(0, 0, 0, 0.5)',
+          'border': '1px solid rgba(255, 255, 255, 0.1)',
+          'backdrop-filter': 'blur(10px)',
+        },
+        '.media-card': {
+          'position': 'relative',
+          'overflow': 'hidden',
+          'border-radius': '0.5rem',
+          'transition': 'transform 0.3s ease',
+          '&:hover': {
+            'transform': 'scale(1.05)',
+          },
+        },
+      });
     }
   ],
   darkMode: 'class'

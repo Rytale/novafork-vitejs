@@ -1,3 +1,14 @@
+/* Prevent overscroll white background */
+html {
+  background-color: black;
+  overscroll-behavior: none;
+}
+
+body {
+  background-color: black;
+  overscroll-behavior: none;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

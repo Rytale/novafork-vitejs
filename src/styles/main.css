@@ -15,6 +15,31 @@ body {
 
 /* Custom styles */
 @layer components {
+  /* Mobile-friendly checkbox styles */
+  .filter-checkbox {
+    @apply relative appearance-none w-5 h-5 border-2 border-gray-500 rounded bg-transparent 
+           checked:bg-purple-600 checked:border-purple-600 
+           transition-colors duration-200 cursor-pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .filter-checkbox:checked::after {
+    content: '';
+    @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+           w-2 h-2 border-white border-r-2 border-b-2 rotate-45;
+  }
+
+  /* Make the entire label clickable with a larger touch target */
+  .filter-checkbox + span {
+    @apply select-none;
+  }
+
+  label:has(.filter-checkbox) {
+    @apply p-2 rounded-lg hover:bg-gray-800/30 transition-colors duration-200
+           min-h-[44px] flex items-center cursor-pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   .glassmorphism {
     @apply bg-black bg-opacity-50 border border-gray-700;
   }
@@ -151,10 +176,6 @@ body {
 
   .filter-select {
     @apply w-full bg-gray-700/50 text-white rounded-lg border border-gray-600 p-2 focus:border-purple-500 focus:ring-purple-500 transition-all duration-200;
-  }
-
-  .filter-checkbox {
-    @apply rounded bg-gray-700/50 border-gray-600 text-purple-600 focus:ring-purple-500 transition-all duration-200;
   }
 
   /* Slide animations */

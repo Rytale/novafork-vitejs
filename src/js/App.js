@@ -177,29 +177,48 @@ export class App {
     }
 
     try {
-      const results = await apiService.searchMedia(query, this.mediaType, 1);
-      if (!results.results.length) {
+      // Search both movies and TV shows regardless of mediaType selection
+      const [movieResults, tvResults] = await Promise.all([
+        apiService.searchMedia(query, 'movie', 1),
+        apiService.searchMedia(query, 'tv', 1)
+      ]);
+
+      // Combine and sort results by popularity
+      let combinedResults = [
+        ...movieResults.results.map(item => ({ ...item, media_type: 'movie' })),
+        ...tvResults.results.map(item => ({ ...item, media_type: 'tv' }))
+      ].sort((a, b) => b.popularity - a.popularity);
+
+      // Filter by mediaType if specific type is selected
+      if (this.mediaType !== 'all') {
+        combinedResults = combinedResults.filter(item => item.media_type === this.mediaType);
+      }
+
+      if (!combinedResults.length) {
         searchSuggestions.classList.add("hidden");
         return;
       }
 
-      const suggestions = results.results
+      const suggestions = combinedResults
         .slice(0, 5)
         .map((media) => {
           const title = media.title || media.name;
           const year = (media.release_date || media.first_air_date || "").split(
             "-"
           )[0];
+          const mediaType = media.media_type;
+          const typeLabel = mediaType === 'movie' ? 'Movie' : 'TV Show';
+          
           return `
-            <div class="suggestion-item p-2 hover:bg-gray-700 cursor-pointer" data-id="${media.id}" data-type="${this.mediaType}">
+            <div class="suggestion-item p-2 hover:bg-gray-700 cursor-pointer" data-id="${media.id}" data-type="${mediaType}">
               <div class="flex items-center">
                 <img src="https://image.tmdb.org/t/p/w92${media.poster_path}" 
                      alt="${title}" 
                      class="w-12 h-16 object-cover rounded mr-3"
                      onerror="this.src='placeholder.jpeg'">
-                <div>
-                  <div class="font-semibold">${title}</div>
-                  <div class="text-sm text-gray-400">${year}</div>
+                <div class="flex-1 min-w-0">
+                  <div class="font-semibold truncate">${title}</div>
+                  <div class="text-sm text-gray-400">${year} • ${typeLabel}</div>
                 </div>
               </div>
             </div>
@@ -248,30 +267,11 @@ export class App {
       // Update URL without triggering navigation
       const url = new URL(window.location);
       url.searchParams.set("id", mediaId);
-      
-      // If mediaType is 'all', we need to determine the actual type
-      let actualMediaType = mediaType;
-      if (mediaType === 'all') {
-        // Try movie first, if it fails, try TV
-        try {
-          await apiService.getMediaDetails(mediaId, 'movie');
-          actualMediaType = 'movie';
-        } catch (error) {
-          try {
-            await apiService.getMediaDetails(mediaId, 'tv');
-            actualMediaType = 'tv';
-          } catch (innerError) {
-            console.error("Could not determine media type:", innerError);
-            return;
-          }
-        }
-      }
-
-      url.searchParams.set("type", actualMediaType);
+      url.searchParams.set("type", mediaType);
       window.history.pushState({}, "", url);
 
       // Display media details with the correct type
-      const media = await apiService.getMediaDetails(mediaId, actualMediaType);
+      const media = await apiService.getMediaDetails(mediaId, mediaType);
       
       // Handle scrolling based on device type
       const popularMedia = dom.$("#popularMedia");
@@ -294,7 +294,7 @@ export class App {
       await new Promise(resolve => setTimeout(resolve, 200));
 
       // Then update the content
-      await this.mediaDetails.displayMedia(media, actualMediaType);
+      await this.mediaDetails.displayMedia(media, mediaType);
 
     } catch (error) {
       console.error("Failed to display media details:", error);
@@ -346,8 +346,8 @@ export class App {
     this.isPopularMediaHidden = !this.isPopularMediaHidden;
     popularMedia.style.display = this.isPopularMediaHidden ? "none" : "grid";
     toggleButton.textContent = this.isPopularMediaHidden
-      ? "Show Available Media"
-      : "Hide Available Media";
+      ? "Show Avalible Media"
+      : "Hide Avalible Media";
   }
 
   async loadPopularMedia() {

@@ -37,6 +37,22 @@ export class App {
     window.episodeModal = this.episodeModal;
   }
 
+  // Helper function to check if device is mobile
+  isMobileDevice() {
+    return window.innerWidth <= 768;
+  }
+
+  // Helper function to scroll element into view
+  scrollIntoViewWithOffset(element, offset = 0) {
+    const elementPosition = element.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - offset;
+    
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth'
+    });
+  }
+
   async initializeApp() {
     try {
       // Initialize MediaGrid after DOM is ready
@@ -175,7 +191,7 @@ export class App {
             "-"
           )[0];
           return `
-            <div class="p-2 hover:bg-gray-700 cursor-pointer" data-id="${media.id}" data-type="${this.mediaType}">
+            <div class="suggestion-item p-2 hover:bg-gray-700 cursor-pointer" data-id="${media.id}" data-type="${this.mediaType}">
               <div class="flex items-center">
                 <img src="https://image.tmdb.org/t/p/w92${media.poster_path}" 
                      alt="${title}" 
@@ -196,14 +212,14 @@ export class App {
 
       // Add click event listeners to suggestions
       const suggestionElements =
-        searchSuggestions.querySelectorAll("[data-id]");
+        searchSuggestions.querySelectorAll(".suggestion-item");
       suggestionElements.forEach((element) => {
-        dom.on(element, "click", () => {
+        dom.on(element, "click", async () => {
           const mediaId = element.dataset.id;
           const mediaType = element.dataset.type;
-          this.handleMediaSelect(mediaId, mediaType);
           searchSuggestions.classList.add("hidden");
           searchInput.value = "";
+          await this.handleMediaSelect(mediaId, mediaType);
         });
       });
     } catch (error) {
@@ -256,13 +272,30 @@ export class App {
 
       // Display media details with the correct type
       const media = await apiService.getMediaDetails(mediaId, actualMediaType);
+      
+      // Handle scrolling based on device type
+      const popularMedia = dom.$("#popularMedia");
+      if (popularMedia) {
+        popularMedia.style.display = "grid";
+        
+        if (this.isMobileDevice()) {
+          // On mobile, use custom scroll with offset
+          this.scrollIntoViewWithOffset(popularMedia, 60);
+        } else {
+          // On desktop, use standard scrollIntoView
+          popularMedia.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start'
+          });
+        }
+      }
+
+      // Wait a short moment for the scroll to complete
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Then update the content
       await this.mediaDetails.displayMedia(media, actualMediaType);
 
-      // Keep trending media visible
-      const popularMedia = dom.$("#popularMedia");
-    if (popularMedia) {
-        popularMedia.style.display = "grid";
-      }
     } catch (error) {
       console.error("Failed to display media details:", error);
     }
@@ -313,8 +346,8 @@ export class App {
     this.isPopularMediaHidden = !this.isPopularMediaHidden;
     popularMedia.style.display = this.isPopularMediaHidden ? "none" : "grid";
     toggleButton.textContent = this.isPopularMediaHidden
-      ? "Show Avalible Media"
-      : "Hide Avalible Media";
+      ? "Show Available Media"
+      : "Hide Available Media";
   }
 
   async loadPopularMedia() {
@@ -373,11 +406,15 @@ export class App {
         // After results are loaded, scroll to the media container if this was triggered by a search
         if (this.searchQuery && popularMedia) {
           setTimeout(() => {
-            popularMedia.scrollIntoView({ 
-              behavior: 'smooth', 
-              block: 'start'
-            });
-          }, 100); // Small delay to ensure content is rendered
+            if (this.isMobileDevice()) {
+              this.scrollIntoViewWithOffset(popularMedia, 60);
+            } else {
+              popularMedia.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start'
+              });
+            }
+          }, 100);
         }
       }
 

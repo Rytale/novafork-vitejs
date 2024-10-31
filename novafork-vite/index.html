@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novafork - Your Gateway to Quality Content</title>
+    <link rel="icon" href="/logo.png" sizes="32x32" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta name="description" content="Novafork breaks down the paywall, ensuring that quality content is accessible to everyone. Click, watch, enjoy.">
+    <meta property="og:title" content="NovaFork">
+    <meta property="og:description" content="Click, watch, enjoy. Novafork breaks down the paywall, ensuring that quality content is accessible to everyone.">
+    <meta property="og:url" content="https://novafork.com">
+    <meta name="theme-color" content="#A17FC0">
+    <meta name="referrer" content="origin">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
+    <!-- HLS.js for video streaming -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="font-poppins bg-gradient-to-br from-gray-900 to-black text-gray-100">
+    <main class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+        <div class="container mx-auto">
+            <!-- Header Section -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 neon-text">
+                    <a href="/" id="logo" class="no-underline">
+                        <span class="text-blue-500">Nova</span><span class="text-purple-500">fork</span>
+                    </a>
+                </h1>
+                <p class="text-sm sm:text-base text-gray-400 mt-2">
+                    Discover and stream your favorite content
+                </p>
+            </div>
+
+            <!-- Social Links -->
+            <div class="flex flex-wrap gap-1 mb-6 justify-center">
+                <a href="https://discord.gg/XbDBBmh5FY" target="_blank"
+                    class="glassmorphism text-white py-1 px-2 sm:py-1.5 sm:px-3 rounded-full flex items-center space-x-1 hover:bg-purple-700 transition duration-300 ease-in-out text-xs sm:text-sm">
+                    <i class="fab fa-discord text-xs sm:text-sm"></i>
+                    <span>Discord</span>
+                </a>
+                <a href="https://t.me/novafork" target="_blank"
+                    class="glassmorphism text-white py-1 px-2 sm:py-1.5 sm:px-3 rounded-full flex items-center space-x-1 hover:bg-blue-700 transition duration-300 ease-in-out text-xs sm:text-sm">
+                    <i class="fab fa-telegram-plane text-xs sm:text-sm"></i>
+                    <span>Telegram</span>
+                </a>
+                <a href="https://github.com/noname25495/novafork" target="_blank"
+                    class="glassmorphism text-white py-1 px-2 sm:py-1.5 sm:px-3 rounded-full flex items-center space-x-1 hover:bg-gray-700 transition duration-300 ease-in-out text-xs sm:text-sm">
+                    <i class="fab fa-github text-xs sm:text-sm"></i>
+                    <span>GitHub</span>
+                </a>
+                <a href="https://ko-fi.com/novafork" target="_blank"
+                    class="glassmorphism text-white py-1 px-2 sm:py-1.5 sm:px-3 rounded-full flex items-center space-x-1 hover:bg-red-700 transition duration-300 ease-in-out text-xs sm:text-sm">
+                    <i class="fas fa-coffee text-xs sm:text-sm"></i>
+                    <span>Ko-Fi</span>
+                </a>
+                <button id="openBitcoinPopup"
+                    class="glassmorphism text-white py-1 px-2 sm:py-1.5 sm:px-3 rounded-full flex items-center space-x-1 hover:bg-yellow-600 transition duration-300 ease-in-out text-xs sm:text-sm">
+                    <i class="fab fa-bitcoin text-xs sm:text-sm"></i>
+                    <span>Bitcoin</span>
+                </button>
+            </div>
+
+            <!-- Search Section -->
+            <div class="relative flex-1 mb-6 sm:mb-8">
+                <input type="text" id="searchInput" placeholder="The Simpsons is nice!"
+                    class="w-full p-2 sm:p-4 pl-10 sm:pl-12 glassmorphism text-white placeholder-gray-400 rounded-full focus:ring-1 sm:focus:ring-2 focus:ring-purple-500 focus:outline-none transition duration-300 ease-in-out text-xs sm:text-base">
+                <i class="fas fa-search absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs sm:text-base"></i>
+                <button id="searchButton"
+                    class="absolute inset-y-0 right-0 text-white font-bold py-1 px-3 sm:py-2 sm:px-6 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 focus:outline-none transition duration-300 ease-in-out text-xs sm:text-base">Search</button>
+                <div id="searchSuggestions"
+                    class="absolute w-full glassmorphism text-white rounded-lg mt-1 hidden z-10 max-h-96 overflow-y-auto hover:cursor-pointer transition duration-300 ease-in-out"></div>
+            </div>
+
+            <!-- Filter Settings -->
+            <div class="mb-12">
+                <h2 class="text-xs sm:text-sm font-semibold text-white mb-3 sm:mb-4">Filter Settings</h2>
+                <div class="flex flex-wrap items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
+                    <select id="categorySelect"
+                        class="p-2 sm:p-3 glassmorphism rounded-full text-white text-xs sm:text-sm focus:ring-1 sm:focus:ring-2 focus:ring-purple-500 focus:outline-none transition duration-300 ease-in-out custom-select">
+                    </select>
+                    <select id="typeSelect"
+                        class="p-2 sm:p-3 glassmorphism rounded-full text-white text-xs sm:text-sm focus:ring-1 sm:focus:ring-2 focus:ring-purple-500 focus:outline-none transition duration-300 ease-in-out custom-select">
+                        <option value="movie">Movies</option>
+                        <option value="tv">TV Shows</option>
+                    </select>
+                    <button id="toggleFiltersButton"
+                        class="p-2 sm:p-3 glassmorphism rounded-full text-white text-xs sm:text-sm flex items-center focus:ring-1 sm:focus:ring-2 focus:ring-purple-500 focus:outline-none transition duration-300 ease-in-out">
+                        <span id="toggleIcon" class="transform transition-transform duration-300 ease-in-out mr-1 sm:mr-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path id="toggleIconPath" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </span>
+                        Advanced Filters
+                    </button>
+                </div>
+
+                <!-- Advanced Filters Section -->
+                <div id="additionalFilters" class="mt-3 sm:mt-4 hidden">
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-4">
+                        <input id="actorSearchInput" type="text" placeholder="Search by Actor"
+                            class="p-2 sm:p-3 glassmorphism rounded-full text-white text-xs sm:text-sm w-full sm:w-64 focus:ring-1 sm:focus:ring-2 focus:ring-purple-500 focus:outline-none transition duration-300 ease-in-out" />
+                        <div class="relative w-full sm:w-auto">
+                            <input id="companySearchInput" type="text" placeholder="Search by Company"
+                                class="p-2 sm:p-3 glassmorphism rounded-full text-white text-xs sm:text-sm w-full sm:w-64 focus:ring-1 sm:focus:ring-2 focus:ring-purple-500 focus:outline-none transition duration-300 ease-in-out" />
+                            <div id="companySuggestions"
+                                class="absolute z-10 w-full sm:w-64 glassmorphism text-white rounded-md shadow-lg overflow-hidden hidden">
+                            </div>
+                        </div>
+                        <div class="relative w-full sm:w-auto">
+                            <input id="collectionSearchInput" type="text" placeholder="Search by Collection"
+                                class="p-2 sm:p-3 glassmorphism rounded-full text-white text-xs sm:text-sm w-full sm:w-64 focus:ring-1 sm:focus:ring-2 focus:ring-purple-500 focus:outline-none transition duration-300 ease-in-out" />
+                            <div id="collectionSuggestions"
+                                class="absolute z-10 w-full sm:w-64 glassmorphism text-white rounded-md shadow-lg overflow-hidden hidden">
+                            </div>
+                        </div>
+                        <div class="relative w-full sm:w-auto">
+                            <input id="franchiseSearchInput" type="text" placeholder="Search by Franchise"
+                                class="p-2 sm:p-3 glassmorphism rounded-full text-white text-xs sm:text-sm w-full sm:w-64 focus:ring-1 sm:focus:ring-2 focus:ring-purple-500 focus:outline-none transition duration-300 ease-in-out" />
+                            <div id="franchiseSuggestions"
+                                class="absolute z-10 w-full sm:w-64 glassmorphism text-white rounded-md shadow-lg overflow-hidden hidden">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Selected Media Section -->
+            <section id="selectedMediaSection" class="mb-12 mt-16 hidden">
+                <h2 class="text-xl sm:text-2xl font-bold mb-4 text-white">Selected Media</h2>
+                <div id="selectedMovie" class="p-4 sm:p-6 rounded-lg flex glassmorphism glow">
+                    <!-- Media details will be injected here -->
+                </div>
+            </section>
+
+            <!-- Media Grid Section -->
+            <section class="mb-12 mt-16">
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
+                    <h2 class="text-lg sm:text-2xl font-bold text-white">Trending Media</h2>
+                    <button id="togglePopularMedia"
+                        class="glassmorphism text-white font-bold py-2 px-4 sm:px-6 rounded-full hover:bg-purple-700 transition duration-300 ease-in-out text-sm sm:text-lg">
+                        Hide Trending Media
+                    </button>
+                </div>
+                <div id="popularMedia" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 p-4">
+                    <!-- Media cards will be dynamically inserted here -->
+                </div>
+            </section>
+
+            <!-- Pagination -->
+            <div class="flex flex-col items-center mt-8 space-y-6">
+                <div class="flex space-x-4">
+                    <button id="prevPage"
+                        class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium py-2 px-4 sm:px-6 rounded-full shadow-lg hover:from-purple-700 hover:to-pink-700 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label="Previous Page">
+                        <span class="flex items-center">
+                            <i class="fas fa-chevron-left mr-2"></i>
+                            Prev
+                        </span>
+                    </button>
+                    <button id="nextPage"
+                        class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium py-2 px-4 sm:px-6 rounded-full shadow-lg hover:from-purple-700 hover:to-pink-700 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label="Next Page">
+                        <span class="flex items-center">
+                            Next
+                            <i class="fas fa-chevron-right ml-2"></i>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="w-full text-gray-400 mt-8">
+                <div class="flex flex-col sm:flex-row justify-between items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-4 px-4">
+                    <p class="text-center sm:text-left">© 2024 Novafork. All rights reserved.</p>
+                    <p class="text-center sm:text-right">
+                        Contact us at:
+                        <a href="mailto:novafork@proton.me" class="text-purple-400 hover:underline">novafork@proton.me</a>
+                    </p>
+                </div>
+                <div class="mt-4 text-center">
+                    <p>This is a fork of the original project by <a href="https://github.com/ambr0sial/nova" target="_blank"
+                            class="text-purple-400 hover:underline">Ambrosial</a>.</p>
+                </div>
+            </footer>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <div id="bitcoinPopup" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+        <!-- Bitcoin popup content -->
+    </div>
+
+    <div id="shareModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+        <!-- Share modal content -->
+    </div>
+
+    <div id="episodeModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+        <!-- Episode modal content -->
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center hidden z-50">
+        <div class="text-center">
+            <div class="w-64 h-2 bg-gray-800 rounded-full overflow-hidden mb-4">
+                <div id="progressBar" class="h-full bg-purple-600 transition-all duration-300"></div>
+            </div>
+            <p id="loadingMessage" class="text-white text-lg font-semibold">Initializing...</p>
+        </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>

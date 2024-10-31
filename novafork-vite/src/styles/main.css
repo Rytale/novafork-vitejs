@@ -1,0 +1,181 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+@layer components {
+  .glassmorphism {
+    @apply bg-opacity-20 backdrop-blur-md bg-gray-900 border border-gray-700;
+  }
+
+  .glassmorphism-form {
+    @apply bg-black bg-opacity-50 backdrop-blur-md border border-gray-800;
+  }
+
+  .media-card {
+    @apply relative overflow-hidden rounded-lg transition-transform duration-300 hover:scale-105 cursor-pointer shadow-lg;
+  }
+
+  .media-card:hover .media-content {
+    @apply opacity-100;
+  }
+
+  .media-card img {
+    @apply w-full h-[300px] object-cover transition-transform duration-300;
+  }
+
+  .media-card:hover img {
+    @apply scale-110;
+  }
+
+  .media-content {
+    @apply absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent opacity-0 transition-opacity duration-300 p-4 flex flex-col justify-end;
+  }
+
+  .media-title {
+    @apply text-lg font-bold text-white mb-2;
+  }
+
+  .media-type {
+    @apply text-sm text-gray-300 mb-2;
+  }
+
+  .media-details {
+    @apply space-y-2 text-sm text-gray-300;
+  }
+
+  .media-badge {
+    @apply absolute top-2 right-2 px-2 py-1 text-xs font-semibold rounded bg-purple-600 text-white;
+  }
+
+  .rating-stars {
+    @apply flex items-center space-x-2;
+  }
+
+  .popularity-score {
+    @apply flex items-center space-x-2;
+  }
+
+  .overview-text {
+    @apply text-xs text-gray-400 mt-2 line-clamp-3;
+  }
+
+  .neon-text {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5),
+                 0 0 20px rgba(255, 255, 255, 0.3),
+                 0 0 30px rgba(255, 255, 255, 0.2);
+  }
+
+  .glow {
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.2),
+                0 0 20px rgba(168, 85, 247, 0.1);
+  }
+
+  .custom-select {
+    @apply appearance-none bg-transparent;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+
+  /* Toggle checkbox styles */
+  .toggle-checkbox {
+    @apply absolute w-10 h-5 opacity-0 z-10 cursor-pointer;
+  }
+
+  .toggle-checkbox + label {
+    @apply bg-gray-700 rounded-full transition-colors duration-200 ease-in-out cursor-pointer;
+  }
+
+  .toggle-checkbox + label:before {
+    content: '';
+    @apply absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform duration-200 ease-in-out;
+  }
+
+  .toggle-checkbox:checked + label {
+    @apply bg-purple-600;
+  }
+
+  .toggle-checkbox:checked + label:before {
+    @apply transform translate-x-5;
+  }
+
+  /* Button gradient styles */
+  .btn-gradient {
+    background: linear-gradient(90deg, #4b0082, #000000);
+    transition: transform 0.3s, background 0.3s;
+  }
+
+  .btn-gradient:hover {
+    transform: scale(1.05);
+    background: linear-gradient(90deg, #6a0dad, #1a1a1a);
+  }
+
+  /* High quality background */
+  .high-quality-bg {
+    @apply bg-no-repeat;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+
+  /* Custom scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-gray-900 rounded-full;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-purple-600 rounded-full;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-purple-700;
+  }
+}
+
+/* Global scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-purple-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-purple-700;
+}
+
+/* Loading animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Note text style */
+.note {
+  @apply text-gray-400 italic;
+}
+
+/* Line clamp utility */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

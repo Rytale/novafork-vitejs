@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+<!-- Previous head content remains the same -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -77,19 +78,21 @@
             </div>
 
             <!-- Filter Settings -->
-            <div class="mb-12">
-                <h2 class="text-xs sm:text-sm font-semibold text-white mb-3 sm:mb-4">Filter Settings</h2>
+            <div class="filter-section">
+                <h2 class="filter-title mb-3 sm:mb-4">
+                    <i class="fas fa-filter filter-icon"></i>
+                    Filter Settings
+                </h2>
                 <div class="flex flex-wrap items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
-                    <select id="categorySelect"
-                        class="p-2 sm:p-3 glassmorphism rounded-full text-white text-xs sm:text-sm focus:ring-1 sm:focus:ring-2 focus:ring-purple-500 focus:outline-none transition duration-300 ease-in-out custom-select">
-                    </select>
-                    <select id="typeSelect"
-                        class="p-2 sm:p-3 glassmorphism rounded-full text-white text-xs sm:text-sm focus:ring-1 sm:focus:ring-2 focus:ring-purple-500 focus:outline-none transition duration-300 ease-in-out custom-select">
+                    <select id="categorySelect" class="filter-select"></select>
+                    <select id="typeSelect" class="filter-select">
+                        <option value="all">All Types</option>
                         <option value="movie">Movies</option>
                         <option value="tv">TV Shows</option>
+                        <option value="anime">Anime</option>
                     </select>
                     <button id="toggleFiltersButton"
-                        class="p-2 sm:p-3 glassmorphism rounded-full text-white text-xs sm:text-sm flex items-center focus:ring-1 sm:focus:ring-2 focus:ring-purple-500 focus:outline-none transition duration-300 ease-in-out">
+                        class="p-2 sm:p-3 glassmorphism rounded-lg text-white text-xs sm:text-sm flex items-center focus:ring-1 sm:focus:ring-2 focus:ring-purple-500 focus:outline-none transition duration-300 ease-in-out hover:bg-gray-800/50">
                         <span id="toggleIcon" class="transform transition-transform duration-300 ease-in-out mr-1 sm:mr-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
@@ -103,29 +106,92 @@
 
                 <!-- Advanced Filters Section -->
                 <div id="additionalFilters" class="mt-3 sm:mt-4 hidden">
+                    <!-- Genre Selection -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2 mb-4">
+                        <label class="flex items-center space-x-2 text-gray-300">
+                            <input type="checkbox" class="filter-checkbox" value="28">
+                            <span>Action</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-300">
+                            <input type="checkbox" class="filter-checkbox" value="12">
+                            <span>Adventure</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-300">
+                            <input type="checkbox" class="filter-checkbox" value="16">
+                            <span>Animation</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-300">
+                            <input type="checkbox" class="filter-checkbox" value="35">
+                            <span>Comedy</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-300">
+                            <input type="checkbox" class="filter-checkbox" value="80">
+                            <span>Crime</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-300">
+                            <input type="checkbox" class="filter-checkbox" value="99">
+                            <span>Documentary</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-300">
+                            <input type="checkbox" class="filter-checkbox" value="18">
+                            <span>Drama</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-300">
+                            <input type="checkbox" class="filter-checkbox" value="10751">
+                            <span>Family</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-300">
+                            <input type="checkbox" class="filter-checkbox" value="14">
+                            <span>Fantasy</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-300">
+                            <input type="checkbox" class="filter-checkbox" value="36">
+                            <span>History</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-300">
+                            <input type="checkbox" class="filter-checkbox" value="27">
+                            <span>Horror</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-300">
+                            <input type="checkbox" class="filter-checkbox" value="10402">
+                            <span>Music</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-300">
+                            <input type="checkbox" class="filter-checkbox" value="9648">
+                            <span>Mystery</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-300">
+                            <input type="checkbox" class="filter-checkbox" value="10749">
+                            <span>Romance</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-300">
+                            <input type="checkbox" class="filter-checkbox" value="878">
+                            <span>Sci-Fi</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-gray-300">
+                            <input type="checkbox" class="filter-checkbox" value="53">
+                            <span>Thriller</span>
+                        </label>
+                    </div>
+
+                    <!-- Search Filters -->
                     <div class="flex flex-wrap items-center gap-2 sm:gap-4">
                         <input id="actorSearchInput" type="text" placeholder="Search by Actor"
-                            class="p-2 sm:p-3 glassmorphism rounded-full text-white text-xs sm:text-sm w-full sm:w-64 focus:ring-1 sm:focus:ring-2 focus:ring-purple-500 focus:outline-none transition duration-300 ease-in-out" />
+                            class="filter-search-input" />
                         <div class="relative w-full sm:w-auto">
                             <input id="companySearchInput" type="text" placeholder="Search by Company"
-                                class="p-2 sm:p-3 glassmorphism rounded-full text-white text-xs sm:text-sm w-full sm:w-64 focus:ring-1 sm:focus:ring-2 focus:ring-purple-500 focus:outline-none transition duration-300 ease-in-out" />
-                            <div id="companySuggestions"
-                                class="absolute z-10 w-full sm:w-64 glassmorphism text-white rounded-md shadow-lg overflow-hidden hidden">
-                            </div>
+                                class="filter-search-input" />
+                            <div id="companySuggestions" class="filter-suggestions"></div>
                         </div>
                         <div class="relative w-full sm:w-auto">
                             <input id="collectionSearchInput" type="text" placeholder="Search by Collection"
-                                class="p-2 sm:p-3 glassmorphism rounded-full text-white text-xs sm:text-sm w-full sm:w-64 focus:ring-1 sm:focus:ring-2 focus:ring-purple-500 focus:outline-none transition duration-300 ease-in-out" />
-                            <div id="collectionSuggestions"
-                                class="absolute z-10 w-full sm:w-64 glassmorphism text-white rounded-md shadow-lg overflow-hidden hidden">
-                            </div>
+                                class="filter-search-input" />
+                            <div id="collectionSuggestions" class="filter-suggestions"></div>
                         </div>
                         <div class="relative w-full sm:w-auto">
                             <input id="franchiseSearchInput" type="text" placeholder="Search by Franchise"
-                                class="p-2 sm:p-3 glassmorphism rounded-full text-white text-xs sm:text-sm w-full sm:w-64 focus:ring-1 sm:focus:ring-2 focus:ring-purple-500 focus:outline-none transition duration-300 ease-in-out" />
-                            <div id="franchiseSuggestions"
-                                class="absolute z-10 w-full sm:w-64 glassmorphism text-white rounded-md shadow-lg overflow-hidden hidden">
-                            </div>
+                                class="filter-search-input" />
+                            <div id="franchiseSuggestions" class="filter-suggestions"></div>
                         </div>
                     </div>
                 </div>
@@ -142,10 +208,10 @@
             <!-- Media Grid Section -->
             <section class="mb-12 mt-16">
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
-                    <h2 class="text-lg sm:text-2xl font-bold text-white">Trending Media</h2>
+                    <h2 class="text-lg sm:text-2xl font-bold text-white">Avalible Media</h2>
                     <button id="togglePopularMedia"
                         class="glassmorphism text-white font-bold py-2 px-4 sm:px-6 rounded-full hover:bg-purple-700 transition duration-300 ease-in-out text-sm sm:text-lg">
-                        Hide Trending Media
+                        Hide Avalible Media
                     </button>
                 </div>
                 <div id="popularMedia" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 p-4">
@@ -153,27 +219,30 @@
                 </div>
             </section>
 
-            <!-- Pagination -->
-            <div class="flex flex-col items-center mt-8 space-y-6">
-                <div class="flex space-x-4">
-                    <button id="prevPage"
-                        class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium py-2 px-4 sm:px-6 rounded-full shadow-lg hover:from-purple-700 hover:to-pink-700 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        aria-label="Previous Page">
-                        <span class="flex items-center">
-                            <i class="fas fa-chevron-left mr-2"></i>
-                            Prev
-                        </span>
-                    </button>
-                    <button id="nextPage"
-                        class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium py-2 px-4 sm:px-6 rounded-full shadow-lg hover:from-purple-700 hover:to-pink-700 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        aria-label="Next Page">
-                        <span class="flex items-center">
-                            Next
-                            <i class="fas fa-chevron-right ml-2"></i>
-                        </span>
-                    </button>
-                </div>
+    <!-- Pagination -->
+    <div class="flex flex-col items-center mt-8">
+        <div class="flex flex-row items-center justify-center w-full gap-4">
+            <button id="prevPage"
+                class="flex-1 sm:flex-none bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium py-3 sm:py-2 px-4 sm:px-6 rounded-full shadow-lg hover:from-purple-700 hover:to-pink-700 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed max-w-[120px]"
+                aria-label="Previous Page">
+                <span class="flex items-center justify-center">
+                    <i class="fas fa-chevron-left mr-2"></i>
+                    Prev
+                </span>
+            </button>
+            <div id="pageDisplay" class="text-white font-medium text-sm sm:text-base whitespace-nowrap">
+                Page 1 of 1
             </div>
+            <button id="nextPage"
+                class="flex-1 sm:flex-none bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium py-3 sm:py-2 px-4 sm:px-6 rounded-full shadow-lg hover:from-purple-700 hover:to-pink-700 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed max-w-[120px]"
+                aria-label="Next Page">
+                <span class="flex items-center justify-center">
+                    Next
+                    <i class="fas fa-chevron-right ml-2"></i>
+                </span>
+            </button>
+        </div>
+    </div>
 
             <!-- Footer -->
             <footer class="w-full text-gray-400 mt-8">

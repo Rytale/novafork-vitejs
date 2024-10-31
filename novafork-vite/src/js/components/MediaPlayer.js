@@ -439,10 +439,16 @@ export class MediaPlayer {
   attemptFullscreenAndLockOrientation(element) {
     if (!element) return;
 
-    const orientationLockEnabled = localStorage.getItem("orientationLock") === "true";
-    const autoFullscreenEnabled = dom.$("#autoFullscreenToggle")?.checked ?? true;
+    const orientationLockEnabled =
+      localStorage.getItem("orientationLock") === "true";
+    const autoFullscreenEnabled =
+      dom.$("#autoFullscreenToggle")?.checked ?? true;
 
-    if (orientationLockEnabled && screen.orientation && screen.orientation.lock) {
+    if (
+      orientationLockEnabled &&
+      screen.orientation &&
+      screen.orientation.lock
+    ) {
       screen.orientation.lock("landscape").catch((err) => {
         console.warn("Orientation lock failed:", err);
       });
@@ -474,7 +480,8 @@ export class MediaPlayer {
     const autoFullscreenToggle = dom.$("#autoFullscreenToggle");
 
     if (orientationLockToggle) {
-      const orientationLockEnabled = localStorage.getItem("orientationLock") === "true";
+      const orientationLockEnabled =
+        localStorage.getItem("orientationLock") === "true";
       orientationLockToggle.checked = orientationLockEnabled;
 
       dom.on(orientationLockToggle, "change", (event) => {
@@ -483,7 +490,8 @@ export class MediaPlayer {
     }
 
     if (autoFullscreenToggle) {
-      const autoFullscreenEnabled = localStorage.getItem("autoFullscreen") !== "false"; // Default to true
+      const autoFullscreenEnabled =
+        localStorage.getItem("autoFullscreen") !== "false"; // Default to true
       autoFullscreenToggle.checked = autoFullscreenEnabled;
 
       dom.on(autoFullscreenToggle, "change", (event) => {

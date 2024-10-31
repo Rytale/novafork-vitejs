@@ -12,6 +12,67 @@
     @apply bg-black bg-opacity-50 border border-gray-800;
   }
 
+  /* Enhanced Filter Styles */
+  .filter-section {
+    @apply glassmorphism rounded-xl p-4 sm:p-6 shadow-lg mb-8;
+  }
+
+  .filter-header {
+    @apply flex items-center justify-between mb-4;
+  }
+
+  .filter-title {
+    @apply text-lg sm:text-xl font-semibold text-white flex items-center;
+  }
+
+  .filter-icon {
+    @apply mr-2 text-purple-400;
+  }
+
+  .filter-select-group {
+    @apply relative flex-1 min-w-[150px];
+  }
+
+  .filter-label {
+    @apply block text-xs text-gray-400 mb-1;
+  }
+
+  .filter-select {
+    @apply w-full p-2 sm:p-3 glassmorphism rounded-lg text-white text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all duration-200 hover:bg-gray-800/50 custom-select;
+  }
+
+  .filter-checkbox-group {
+    @apply flex items-center p-2 glassmorphism rounded-lg cursor-pointer group hover:bg-gray-800/50 transition-all duration-200;
+  }
+
+  .filter-checkbox-custom {
+    @apply w-4 h-4 border-2 border-gray-500 rounded flex items-center justify-center mr-2 group-hover:border-purple-400;
+  }
+
+  .filter-checkbox-icon {
+    @apply text-purple-400 opacity-0 group-hover:opacity-50 transition-opacity duration-200;
+  }
+
+  .filter-checkbox-label {
+    @apply text-sm text-gray-300 group-hover:text-white transition-colors duration-200;
+  }
+
+  .filter-search-group {
+    @apply relative;
+  }
+
+  .filter-search-input {
+    @apply w-full pl-10 p-2 sm:p-3 glassmorphism rounded-lg text-white text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all duration-200 hover:bg-gray-800/50;
+  }
+
+  .filter-search-icon {
+    @apply absolute left-3 top-1/2 -translate-y-1/2 text-gray-400;
+  }
+
+  .filter-suggestions {
+    @apply absolute z-10 w-full glassmorphism text-white rounded-md shadow-lg overflow-hidden hidden mt-1;
+  }
+
   .media-card {
     @apply relative overflow-hidden rounded-lg transition-transform duration-300 hover:scale-105 cursor-pointer shadow-lg;
   }
@@ -58,6 +119,62 @@
 
   .overview-text {
     @apply text-xs text-gray-400 mt-2 line-clamp-3;
+  }
+
+  /* Advanced Filters Styles */
+  #toggleFiltersButton {
+    @apply flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-white bg-gray-800/50 rounded-lg hover:bg-gray-700/50 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200;
+  }
+
+  #additionalFilters {
+    @apply mt-4 p-4 bg-gray-800/50 rounded-lg space-y-4 transition-all duration-200;
+  }
+
+  .filter-group {
+    @apply space-y-2;
+  }
+
+  .filter-label {
+    @apply block text-sm font-medium text-gray-300;
+  }
+
+  .filter-select {
+    @apply w-full bg-gray-700/50 text-white rounded-lg border border-gray-600 p-2 focus:border-purple-500 focus:ring-purple-500 transition-all duration-200;
+  }
+
+  .filter-checkbox {
+    @apply rounded bg-gray-700/50 border-gray-600 text-purple-600 focus:ring-purple-500 transition-all duration-200;
+  }
+
+  /* Slide animations */
+  .animate-slide-down {
+    animation: slideDown 0.2s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.2s ease-out forwards;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
   }
 
   /* Episode Modal Styles */
@@ -156,36 +273,36 @@
     @apply ring-2 ring-purple-400;
   }
 
- /* Button gradient styles */
- .btn-gradient {
-  background: linear-gradient(90deg, #4b0082, #000000);
-  transition: transform 0.3s, background 0.3s;
-}
+  /* Button gradient styles */
+  .btn-gradient {
+    background: linear-gradient(90deg, #4b0082, #000000);
+    transition: transform 0.3s, background 0.3s;
+  }
 
-.btn-gradient:hover {
-  transform: scale(1.05);
-  background: linear-gradient(90deg, #6a0dad, #1a1a1a);
-}
+  .btn-gradient:hover {
+    transform: scale(1.05);
+    background: linear-gradient(90deg, #6a0dad, #1a1a1a);
+  }
 
-/* High quality background */
-.high-quality-bg {
-  @apply bg-no-repeat;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
-}
+  /* High quality background */
+  .high-quality-bg {
+    @apply bg-no-repeat;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
 
-/* Custom scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-  height: 6px;
-}
+  /* Custom scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    height: 6px;
+  }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  @apply bg-gray-900 rounded-full;
-}
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-gray-900 rounded-full;
+  }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-purple-600 rounded-full;
-}
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-purple-600 rounded-full;
+  }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     @apply bg-purple-700;

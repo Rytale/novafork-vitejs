@@ -28,8 +28,8 @@ class ApiService {
 
   async getSeasonDetails(tvId, seasonNumber) {
     return this.fetchFromTMDB(`/tv/${tvId}/season/${seasonNumber}`, {
-      language: 'en-US',
-      append_to_response: 'credits,images'
+      language: "en-US",
+      append_to_response: "credits,images",
     });
   }
 
@@ -40,7 +40,32 @@ class ApiService {
         return cache.get(cacheKey);
       }
 
-      // Fetch release dates and watch providers concurrently
+      // For TV shows, only check watch providers
+      if (mediaType === "tv") {
+        const watchProvidersData = await this.fetchFromTMDB(
+          `/${mediaType}/${mediaId}/watch/providers`
+        );
+        const isStreamingAvailable =
+          this.checkStreamingAvailability(watchProvidersData);
+        const isRentalOrPurchaseAvailable =
+          this.checkRentalOrPurchaseAvailability(watchProvidersData);
+
+        let releaseType = "Unknown Quality";
+        if (isStreamingAvailable) {
+          releaseType = "HD";
+        } else if (isRentalOrPurchaseAvailable) {
+          releaseType = "HD";
+        }
+
+        const result = {
+          releaseType,
+          certifications: "TV Rating",
+        };
+        cache.set(cacheKey, result);
+        return result;
+      }
+
+      // For movies, check both release dates and watch providers
       const [releaseDatesData, watchProvidersData] = await Promise.all([
         this.fetchFromTMDB(`/${mediaType}/${mediaId}/release_dates`),
         this.fetchFromTMDB(`/${mediaType}/${mediaId}/watch/providers`),
@@ -158,7 +183,7 @@ class ApiService {
     isStreamingAvailable,
     isDigitalRelease,
     hasFutureRelease,
-    isRentalOrPurchaseAvailable,
+   
   }) {
     if (isInTheaters && !isStreamingAvailable && !isDigitalRelease) {
       return "Cam";
@@ -166,14 +191,37 @@ class ApiService {
       return "HD";
     } else if (hasFutureRelease && !isInTheaters) {
       return "Not Released Yet";
-    } else if (isRentalOrPurchaseAvailable) {
-      return "Rental/Buy Available";
     } else {
       return "Unknown Quality";
     }
   }
 
   async searchMedia(query, type = "movie", page = 1) {
+    if (type === "all") {
+      // Search both movies and TV shows
+      const [movieResults, tvResults] = await Promise.all([
+        this.fetchFromTMDB("/search/movie", {
+          query,
+          page,
+          include_adult: false,
+          language: "en-US",
+        }),
+        this.fetchFromTMDB("/search/tv", {
+          query,
+          page,
+          include_adult: false,
+          language: "en-US",
+        }),
+      ]);
+
+      // Combine and sort results by popularity
+      return {
+        results: [...movieResults.results, ...tvResults.results].sort(
+          (a, b) => b.popularity - a.popularity
+        ),
+      };
+    }
+
     return this.fetchFromTMDB(`/search/${type}`, {
       query,
       page,
@@ -182,7 +230,97 @@ class ApiService {
     });
   }
 
-  async getMediaByCategory(category, type = "movie", page = 1) {
+  async getMediaByCategory(category, type = "movie", page = 1, withGenres = []) {
+    if (type === "all") {
+      // Get both movies and TV shows
+      const [movieResults, tvResults] = await Promise.all([
+        this.getMediaByCategory(category, "movie", page, withGenres),
+        this.getMediaByCategory(category, "tv", page, withGenres)
+      ]);
+
+      // Add media_type to each result
+      const moviesWithType = movieResults.results.map(movie => ({
+        ...movie,
+        media_type: 'movie'
+      }));
+      const tvWithType = tvResults.results.map(tv => ({
+        ...tv,
+        media_type: 'tv'
+      }));
+
+      // Combine and sort results by popularity
+      return {
+        results: [...moviesWithType, ...tvWithType]
+          .sort((a, b) => b.popularity - a.popularity)
+          .slice(0, 20), // Limit to 20 items per page
+        total_pages: Math.max(movieResults.total_pages || 1, tvResults.total_pages || 1)
+      };
+    }
+
+    // If genres are selected, use discover endpoint
+    if (withGenres.length > 0) {
+      const params = {
+        language: "en-US",
+        sort_by: "popularity.desc",
+        with_genres: withGenres.join(','),
+        include_adult: false,
+        include_video: false,
+        vote_count_gte: 10,
+        page
+      };
+
+      // Add category-specific parameters
+      switch (category) {
+        case "upcoming":
+          const today = new Date();
+          const threeMonthsFromNow = new Date();
+          threeMonthsFromNow.setMonth(today.getMonth() + 3);
+          params.release_date_gte = today.toISOString().split('T')[0];
+          params.release_date_lte = threeMonthsFromNow.toISOString().split('T')[0];
+          params.vote_count_gte = 0;
+          break;
+        case "now_playing":
+          const oneMonthAgo = new Date();
+          oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+          params.release_date_gte = oneMonthAgo.toISOString().split('T')[0];
+          params.release_date_lte = new Date().toISOString().split('T')[0];
+          break;
+        case "top_rated":
+          params.sort_by = "vote_average.desc";
+          params.vote_count_gte = 100;
+          params["vote_average.gte"] = 7;
+          break;
+      }
+
+      // For TV shows, adjust parameters
+      if (type === "tv") {
+        delete params.release_date_gte;
+        delete params.release_date_lte;
+        
+        switch (category) {
+          case "on_the_air":
+            params.air_date_gte = new Date().toISOString().split('T')[0];
+            break;
+          case "airing_today":
+            const today = new Date().toISOString().split('T')[0];
+            params.air_date_gte = today;
+            params.air_date_lte = today;
+            break;
+        }
+      }
+
+      const results = await this.fetchFromTMDB(`/discover/${type}`, params);
+      
+      // Add media_type to each result
+      results.results = results.results.map(item => ({
+        ...item,
+        media_type: type
+      }));
+
+      return results;
+    }
+
+    // If no genres selected, use category endpoint
     let endpoint;
     if (type === "movie") {
       switch (category) {
@@ -220,10 +358,18 @@ class ApiService {
       }
     }
 
-    return this.fetchFromTMDB(endpoint, {
+    const results = await this.fetchFromTMDB(endpoint, {
       page,
       language: "en-US",
     });
+    
+    // Add media_type to each result
+    results.results = results.results.map(item => ({
+      ...item,
+      media_type: type
+    }));
+
+    return results;
   }
 
   async getMediaDetails(id, type = "movie") {

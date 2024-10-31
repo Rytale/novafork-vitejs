@@ -132,16 +132,16 @@
 
   /* Toggle checkbox styles */
   .toggle-checkbox {
-    @apply absolute w-10 h-5 opacity-0 z-10 cursor-pointer;
+    @apply sr-only;
   }
 
   .toggle-checkbox + label {
-    @apply bg-gray-700 rounded-full transition-colors duration-200 ease-in-out cursor-pointer;
+    @apply relative block w-12 h-6 rounded-full bg-gray-700 cursor-pointer transition-colors duration-200 ease-in-out;
   }
 
   .toggle-checkbox + label:before {
     content: '';
-    @apply absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform duration-200 ease-in-out;
+    @apply absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 ease-in-out;
   }
 
   .toggle-checkbox:checked + label {
@@ -149,39 +149,43 @@
   }
 
   .toggle-checkbox:checked + label:before {
-    @apply transform translate-x-5;
+    @apply transform translate-x-6;
   }
 
-  /* Button gradient styles */
-  .btn-gradient {
-    background: linear-gradient(90deg, #4b0082, #000000);
-    transition: transform 0.3s, background 0.3s;
+  .toggle-checkbox:focus + label {
+    @apply ring-2 ring-purple-400;
   }
 
-  .btn-gradient:hover {
-    transform: scale(1.05);
-    background: linear-gradient(90deg, #6a0dad, #1a1a1a);
-  }
+ /* Button gradient styles */
+ .btn-gradient {
+  background: linear-gradient(90deg, #4b0082, #000000);
+  transition: transform 0.3s, background 0.3s;
+}
 
-  /* High quality background */
-  .high-quality-bg {
-    @apply bg-no-repeat;
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
-  }
+.btn-gradient:hover {
+  transform: scale(1.05);
+  background: linear-gradient(90deg, #6a0dad, #1a1a1a);
+}
 
-  /* Custom scrollbar */
-  .custom-scrollbar::-webkit-scrollbar {
-    height: 6px;
-  }
+/* High quality background */
+.high-quality-bg {
+  @apply bg-no-repeat;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
 
-  .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-gray-900 rounded-full;
-  }
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 6px;
+}
 
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-purple-600 rounded-full;
-  }
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-gray-900 rounded-full;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-purple-600 rounded-full;
+}
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     @apply bg-purple-700;

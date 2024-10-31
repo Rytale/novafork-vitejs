@@ -66,11 +66,14 @@
         </div>
 
         <!-- Orientation Lock Toggle -->
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between p-2 rounded-lg bg-gray-800">
           <label for="orientationLockToggle" class="block text-xs sm:text-sm font-semibold text-gray-200">
-            <i class="fas fa-sync-alt mr-2"></i>Orientation Lock:
+            <i class="fas fa-sync-alt mr-2"></i>Orientation Lock
           </label>
-          <input type="checkbox" id="orientationLockToggle" class="toggle-checkbox">
+          <div class="relative inline-block w-12 align-middle select-none">
+            <input type="checkbox" id="orientationLockToggle" class="toggle-checkbox" />
+            <label for="orientationLockToggle" class="block w-12 h-6 rounded-full bg-gray-700 cursor-pointer"></label>
+          </div>
         </div>
 
         <p class="text-xs note">Note: The "Best Providers (No Ads)" section contains providers with no ads. Other providers may include ads.</p>
@@ -83,14 +86,22 @@
           </button>
         </div>
 
-        <!-- Play Button -->
-        <button id="playButton"
-                class="w-full btn-gradient hover:scale-105 text-white font-bold py-1 sm:py-2 px-2 sm:px-3 rounded-lg shadow-lg transition-all duration-300 ease-in-out">
-          <i class="fas fa-play mr-2"></i>Play
-        </button>
-        <button id="closePlayerButton"
-                class="w-full bg-gradient-to-r from-red-600 to-red-800 hover:bg-red-900 text-white font-bold py-1 sm:py-2 px-2 sm:px-3 rounded-lg shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 hidden">
-          <i class="fas fa-times mr-2"></i>Close Player
+        <!-- Play/Close Button Container -->
+        <div>
+          <button id="playButton"
+                  class="w-full btn-gradient hover:scale-105 text-white font-bold py-1 sm:py-2 px-2 sm:px-3 rounded-lg shadow-lg transition-all duration-300 ease-in-out">
+            <i class="fas fa-play mr-2"></i>Play
+          </button>
+          <button id="closePlayerButton"
+                  class="w-full bg-gradient-to-r from-red-600 to-red-800 hover:bg-red-900 text-white font-bold py-1 sm:py-2 px-2 sm:px-3 rounded-lg shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 hidden">
+            <i class="fas fa-times mr-2"></i>Close Player
+          </button>
+        </div>
+
+        <!-- Share Button -->
+        <button id="shareButton"
+                class="w-full bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-bold py-1 sm:py-2 px-2 sm:px-3 rounded-lg shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105">
+          <i class="fas fa-share-alt mr-2"></i>Share
         </button>
       </div>
     </div>

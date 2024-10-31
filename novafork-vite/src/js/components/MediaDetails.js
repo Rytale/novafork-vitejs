@@ -5,6 +5,8 @@ export class MediaDetails {
   constructor(mediaPlayer) {
     this.mediaPlayer = mediaPlayer;
     this.template = null;
+    this.currentMedia = null;
+    this.currentMediaType = null;
     this.loadTemplate();
   }
 
@@ -17,7 +19,6 @@ export class MediaDetails {
       this.template = await response.text();
     } catch (error) {
       console.error('Failed to load media template:', error);
-      // Provide a basic fallback template
       this.template = `
         <div class="container mx-auto p-4">
           <div class="text-center text-red-500">
@@ -65,6 +66,9 @@ export class MediaDetails {
   }
 
   async displayMedia(media, mediaType) {
+    this.currentMedia = media;
+    this.currentMediaType = mediaType;
+
     // Wait for template to load if it hasn't already
     if (!this.template) {
       await new Promise(resolve => {
@@ -157,12 +161,6 @@ export class MediaDetails {
         closePlayerButton.classList.add('hidden');
       }
 
-      // Keep trending media visible
-      const popularMedia = dom.$('#popularMedia');
-      if (popularMedia) {
-        popularMedia.style.display = 'grid';
-      }
-
     } catch (error) {
       console.error('Failed to display media details:', error);
       throw error;
@@ -176,6 +174,7 @@ export class MediaDetails {
     const providerSelect = dom.$('#providerSelect');
     const selectEpisodeButton = dom.$('#selectEpisodeButton');
     const orientationLockToggle = dom.$('#orientationLockToggle');
+    const episodeModal = dom.$('#episodeModal');
 
     if (playButton) {
       dom.on(playButton, 'click', () => {
@@ -213,11 +212,11 @@ export class MediaDetails {
       });
     }
 
-    if (selectEpisodeButton && mediaType === 'tv') {
+    if (selectEpisodeButton && mediaType === 'tv' && episodeModal) {
       dom.on(selectEpisodeButton, 'click', () => {
-        const episodeModal = dom.$('#episodeModal');
-        if (episodeModal) {
-          episodeModal.classList.remove('hidden');
+        const episodeModalInstance = window.episodeModal;
+        if (episodeModalInstance) {
+          episodeModalInstance.show(media);
         }
       });
     }

@@ -5,11 +5,11 @@
 /* Custom styles */
 @layer components {
   .glassmorphism {
-    @apply bg-opacity-20 backdrop-blur-md bg-gray-900 border border-gray-700;
+    @apply bg-black bg-opacity-50 border border-gray-700;
   }
 
   .glassmorphism-form {
-    @apply bg-black bg-opacity-50 backdrop-blur-md border border-gray-800;
+    @apply bg-black bg-opacity-50 border border-gray-800;
   }
 
   .media-card {
@@ -58,6 +58,56 @@
 
   .overview-text {
     @apply text-xs text-gray-400 mt-2 line-clamp-3;
+  }
+
+  /* Episode Modal Styles */
+  #episodeModal {
+    @apply fixed inset-0 z-50 bg-black bg-opacity-75;
+    display: none;
+  }
+
+  #episodeModal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .episode-item {
+    @apply transition-all duration-200;
+  }
+
+  .episode-item:hover {
+    @apply transform scale-[1.02];
+  }
+
+  .episode-item img {
+    @apply transition-all duration-200;
+  }
+
+  .episode-item:hover img {
+    @apply brightness-110;
+  }
+
+  /* Custom scrollbar for episode lists */
+  .episode-list::-webkit-scrollbar,
+  #episodesList::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .episode-list::-webkit-scrollbar-track,
+  #episodesList::-webkit-scrollbar-track {
+    @apply bg-[#1a1a1a];
+  }
+
+  .episode-list::-webkit-scrollbar-thumb,
+  #episodesList::-webkit-scrollbar-thumb {
+    @apply bg-[#333333] rounded-full;
+  }
+
+  .episode-list::-webkit-scrollbar-thumb:hover,
+  #episodesList::-webkit-scrollbar-thumb:hover {
+    @apply bg-[#404040];
   }
 
   .neon-text {

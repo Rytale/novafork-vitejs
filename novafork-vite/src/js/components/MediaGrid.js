@@ -1,4 +1,6 @@
 import { dom } from '../utils/helpers';
+import { API_CONFIG } from '../api/config';
+import { apiService } from '../api/apiService';
 
 export class MediaGrid {
   constructor() {
@@ -8,13 +10,35 @@ export class MediaGrid {
     }
   }
 
+  getQualityClass(releaseType) {
+    switch (releaseType) {
+      case 'Cam':
+        return 'bg-red-600';
+      case 'HD':
+        return 'bg-yellow-600';
+      case 'Not Released Yet':
+        return 'bg-blue-600';
+      case 'Rental/Buy Available':
+        return 'bg-green-600';
+      default:
+        return 'bg-gray-600';
+    }
+  }
+
   async displayMedia(mediaList, mediaType) {
     if (!mediaList || !mediaList.length) {
       this.container.innerHTML = '<p class="text-center text-gray-400">No results found</p>';
       return;
     }
 
-    const mediaCards = mediaList.map(media => this.createMediaCard(media, mediaType)).join('');
+    // Get release types for all media items concurrently
+    const releasePromises = mediaList.map(media => apiService.getReleaseType(media.id, mediaType));
+    const releaseTypes = await Promise.all(releasePromises);
+
+    const mediaCards = mediaList.map((media, index) => 
+      this.createMediaCard(media, mediaType, releaseTypes[index])
+    ).join('');
+
     this.container.innerHTML = mediaCards;
 
     // Add click event listeners to each card
@@ -23,7 +47,6 @@ export class MediaGrid {
       dom.on(card, 'click', () => {
         const mediaId = card.dataset.id;
         const mediaType = card.dataset.type;
-        // Dispatch custom event for media selection
         window.dispatchEvent(new CustomEvent('mediaSelect', {
           detail: { mediaId, mediaType }
         }));
@@ -31,17 +54,18 @@ export class MediaGrid {
     });
   }
 
-  createMediaCard(media, mediaType) {
+  createMediaCard(media, mediaType, releaseInfo) {
     const title = media.title || media.name;
     const releaseDate = media.release_date || media.first_air_date;
     const year = releaseDate ? new Date(releaseDate).getFullYear() : '';
     const rating = media.vote_average ? (media.vote_average * 10).toFixed(0) + '%' : 'N/A';
     const overview = media.overview ? media.overview.slice(0, 150) + (media.overview.length > 150 ? '...' : '') : 'No overview available';
     const posterPath = media.poster_path 
-      ? `https://image.tmdb.org/t/p/w500${media.poster_path}`
+      ? `${API_CONFIG.imageBaseUrl}/${API_CONFIG.imageSizes.poster.large}${media.poster_path}`
       : 'placeholder.jpg';
     const popularity = media.popularity ? media.popularity.toFixed(1) : 'N/A';
     const voteCount = media.vote_count ? media.vote_count.toLocaleString() : '0';
+    const qualityClass = this.getQualityClass(releaseInfo.releaseType);
 
     return `
       <div class="media-card relative overflow-hidden rounded-lg transition-transform duration-300 hover:scale-105 cursor-pointer" data-id="${media.id}" data-type="${mediaType}">
@@ -68,6 +92,9 @@ export class MediaGrid {
         </div>
         <div class="absolute top-2 right-2 px-2 py-1 text-xs font-semibold rounded bg-purple-600 text-white">
           ${mediaType === 'movie' ? 'Movie' : 'TV'}
+        </div>
+        <div class="absolute top-2 left-2 px-2 py-1 text-xs font-semibold rounded ${qualityClass} text-white">
+          ${releaseInfo.releaseType}
         </div>
       </div>
     `;

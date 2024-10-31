@@ -1,245 +1,198 @@
 import { dom } from '../utils/helpers';
 import { apiService } from '../api/apiService';
+import { API_CONFIG } from '../api/config';
 
 export class EpisodeModal {
-  constructor() {
-    this.modal = null;
-    this.setupModal();
+  constructor(mediaPlayer) {
+    this.mediaPlayer = mediaPlayer;
+    this.modal = dom.$('#episodeModal');
+    this.currentMedia = null;
     this.setupEventListeners();
   }
 
-  setupModal() {
-    // Get or create modal container
-    let modalContainer = dom.$('#episodeModal');
-    if (!modalContainer) {
-      modalContainer = document.createElement('div');
-      modalContainer.id = 'episodeModal';
-      modalContainer.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50';
-      document.body.appendChild(modalContainer);
-    }
-
-    this.modal = modalContainer;
-  }
-
   setupEventListeners() {
-    // Close modal when clicking outside
-    if (this.modal) {
-      dom.on(this.modal, 'click', (e) => {
-        if (e.target === this.modal) {
-          this.hide();
-        }
-      });
+    if (!this.modal) return;
 
-      // Close on escape key
-      dom.on(document, 'keydown', (e) => {
-        if (e.key === 'Escape') {
-          this.hide();
-        }
-      });
-    }
+    // Close modal when clicking outside
+    dom.on(this.modal, 'click', (e) => {
+      if (e.target === this.modal) {
+        this.hide();
+      }
+    });
+
+    // Close modal when pressing escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        this.hide();
+      }
+    });
   }
 
   async show(media) {
     if (!this.modal) return;
+    this.currentMedia = media;
 
     try {
-      const tvShowData = await apiService.getMediaDetails(media.id, 'tv');
-      const seasons = tvShowData.seasons.filter(season => season.season_number !== 0);
-
-      if (seasons.length === 0) {
-        alert('No seasons available for this show.');
-        return;
-      }
-
-      // Get stored progress data
+      const details = await apiService.getMediaDetails(media.id, 'tv');
+      const seasons = details.seasons || [];
       const storedData = JSON.parse(localStorage.getItem('vidLinkProgress') || '{}');
-      const progressData = storedData[media.id];
+      const progressData = storedData[media.id] || {};
+      const lastSeasonWatched = progressData.last_season_watched || 1;
+      const lastEpisodeWatched = progressData.last_episode_watched || 1;
 
-      this.modal.innerHTML = `
-        <div class="bg-[#1a1a1a] rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-          <div class="flex flex-col md:flex-row">
+      // Get season details for the last watched season
+      const seasonDetails = await apiService.getSeasonDetails(media.id, lastSeasonWatched);
+
+      const content = `
+        <div class="relative bg-[#141414] text-white max-w-5xl w-full mx-4 rounded-lg overflow-hidden">
+          <div class="flex justify-between items-center p-4 border-b border-gray-800">
+            <h2 class="text-2xl font-bold">Select Episode</h2>
+            <button id="closeModalBtn" class="text-gray-400 hover:text-white transition-colors">
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+
+          <div class="flex h-[600px]">
             <!-- Seasons List -->
-            <div class="md:w-1/3 border-r border-gray-800 pr-4">
-              <h3 class="text-xl font-bold text-white mb-4">Seasons</h3>
-              <div class="space-y-4">
-                ${seasons.map(season => {
-                  const seasonNumber = season.season_number;
-                  const episodesInSeason = season.episode_count;
-                  const progressKey = `s${seasonNumber}`;
-                  const seasonProgress = storedData[progressKey] || { watched: 0 };
-                  const progressPercentage = Math.round((seasonProgress.watched / episodesInSeason) * 100);
-
-                  return `
-                    <div class="season-item cursor-pointer hover:bg-gray-800 p-3 rounded transition-colors"
-                         data-season="${seasonNumber}">
-                      <div class="flex items-center space-x-4">
-                        <img src="${season.poster_path ? 'https://image.tmdb.org/t/p/w200' + season.poster_path : '/placeholder-poster.jpg'}"
-                             alt="Season ${seasonNumber}"
-                             class="w-16 h-24 object-cover rounded">
-                        <div>
-                          <h4 class="text-white font-semibold">Season ${seasonNumber}</h4>
-                          <p class="text-gray-400 text-sm">${episodesInSeason} Episodes</p>
-                          <div class="w-full bg-gray-800 h-1 rounded-full mt-2">
-                            <div class="bg-purple-600 h-full rounded-full" style="width: ${progressPercentage}%;"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  `;
-                }).join('')}
+            <div class="w-64 bg-[#1a1a1a] border-r border-gray-800 overflow-y-auto">
+              <div class="p-4">
+                <h3 class="text-lg font-semibold mb-4">Seasons</h3>
+                <div class="space-y-2">
+                  ${seasons.map(season => `
+                    <button 
+                      class="w-full text-left px-4 py-3 rounded ${season.season_number === lastSeasonWatched ? 'bg-[#333333] text-white' : 'text-gray-400 hover:bg-[#262626]'} transition-colors"
+                      data-season="${season.season_number}">
+                      <div class="font-medium">Season ${season.season_number}</div>
+                      <div class="text-sm text-gray-500">${season.episode_count} Episodes</div>
+                    </button>
+                  `).join('')}
+                </div>
               </div>
             </div>
 
             <!-- Episodes List -->
-            <div class="md:w-2/3 pl-4">
-              <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-white">Episodes</h3>
-                <input type="text" placeholder="Search episodes..."
-                       class="px-4 py-2 bg-[#0a0a0a] text-white rounded border border-gray-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                       id="episodeSearch">
-              </div>
-              <div id="episodesList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Episodes will be loaded here -->
-              </div>
+            <div class="flex-1 overflow-y-auto p-4" id="episodesList">
+              ${this.generateEpisodesList(seasonDetails.episodes, media.backdrop_path)}
             </div>
           </div>
-
-          <button class="absolute top-4 right-4 text-gray-400 hover:text-white">
-            <i class="fas fa-times text-xl"></i>
-          </button>
         </div>
       `;
 
-      this.modal.classList.remove('hidden');
-      this.setupSeasonClickHandlers(media);
-      this.setupEpisodeSearch();
+      this.modal.innerHTML = content;
+      this.modal.classList.add('active');
 
-      // Load first season or last watched season
-      const initialSeason = progressData?.last_season_watched || 1;
-      this.loadEpisodes(media.id, initialSeason);
-    } catch (error) {
-      console.error('Failed to load episodes:', error);
-      alert('Failed to load episodes. Please try again.');
-    }
-  }
+      // Setup event listeners
+      const seasonButtons = this.modal.querySelectorAll('[data-season]');
+      const closeButton = this.modal.querySelector('#closeModalBtn');
+      const episodesList = this.modal.querySelector('#episodesList');
 
-  async loadEpisodes(tvShowId, seasonNumber) {
-    try {
-      const seasonData = await apiService.getSeasonDetails(tvShowId, seasonNumber);
-      const episodesList = dom.$('#episodesList');
-      
-      if (!episodesList) return;
-
-      const storedData = JSON.parse(localStorage.getItem('vidLinkProgress') || '{}');
-
-      episodesList.innerHTML = seasonData.episodes.map(episode => {
-        const episodeKey = `s${seasonNumber}e${episode.episode_number}`;
-        const progress = storedData[episodeKey] || { watched: 0, duration: 0 };
-        const progressPercentage = progress.duration ? (progress.watched / progress.duration) * 100 : 0;
-
-        return `
-          <div class="episode-item bg-[#0a0a0a] rounded overflow-hidden cursor-pointer hover:transform hover:scale-105 transition-all duration-300"
-               data-episode="${episode.episode_number}">
-            <img src="${episode.still_path ? 'https://image.tmdb.org/t/p/w300' + episode.still_path : '/placeholder-episode.jpg'}"
-                 alt="Episode ${episode.episode_number}"
-                 class="w-full h-40 object-cover">
-            <div class="p-4">
-              <h4 class="text-white font-semibold mb-1">Episode ${episode.episode_number}: ${episode.name}</h4>
-              <p class="text-gray-400 text-sm mb-2">${episode.overview.substring(0, 100)}...</p>
-              <div class="w-full bg-gray-800 h-1 rounded-full">
-                <div class="bg-purple-600 h-full rounded-full" style="width: ${progressPercentage}%;"></div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      this.setupEpisodeClickHandlers(tvShowId, seasonNumber);
-    } catch (error) {
-      console.error('Failed to load episodes:', error);
-    }
-  }
-
-  setupSeasonClickHandlers(media) {
-    const seasonItems = dom.$$('.season-item');
-    seasonItems.forEach(item => {
-      dom.on(item, 'click', () => {
-        const seasonNumber = parseInt(item.dataset.season, 10);
-        this.loadEpisodes(media.id, seasonNumber);
-      });
-    });
-  }
-
-  setupEpisodeClickHandlers(tvShowId, seasonNumber) {
-    const episodeItems = dom.$$('.episode-item');
-    episodeItems.forEach(item => {
-      dom.on(item, 'click', () => {
-        const episodeNumber = parseInt(item.dataset.episode, 10);
-        this.selectEpisode(tvShowId, seasonNumber, episodeNumber);
-      });
-    });
-  }
-
-  setupEpisodeSearch() {
-    const searchInput = dom.$('#episodeSearch');
-    if (searchInput) {
-      dom.on(searchInput, 'input', () => {
-        const searchTerm = searchInput.value.toLowerCase();
-        const episodes = dom.$$('.episode-item');
-        
-        episodes.forEach(episode => {
-          const title = episode.querySelector('h4').textContent.toLowerCase();
-          const overview = episode.querySelector('p').textContent.toLowerCase();
+      seasonButtons.forEach(button => {
+        dom.on(button, 'click', async (e) => {
+          e.stopPropagation(); // Prevent event bubbling
+          const selectedSeason = parseInt(button.dataset.season);
+          // Update active season button
+          seasonButtons.forEach(btn => {
+            btn.classList.remove('bg-[#333333]', 'text-white');
+            btn.classList.add('text-gray-400', 'hover:bg-[#262626]');
+          });
+          button.classList.remove('text-gray-400', 'hover:bg-[#262626]');
+          button.classList.add('bg-[#333333]', 'text-white');
           
-          if (title.includes(searchTerm) || overview.includes(searchTerm)) {
-            episode.style.display = '';
-          } else {
-            episode.style.display = 'none';
-          }
+          // Fetch and update episodes list
+          const newSeasonDetails = await apiService.getSeasonDetails(media.id, selectedSeason);
+          episodesList.innerHTML = this.generateEpisodesList(newSeasonDetails.episodes, media.backdrop_path);
+          this.setupEpisodeClickHandlers(media);
         });
       });
+
+      if (closeButton) {
+        dom.on(closeButton, 'click', (e) => {
+          e.stopPropagation(); // Prevent event bubbling
+          this.hide();
+        });
+      }
+
+      this.setupEpisodeClickHandlers(media);
+
+    } catch (error) {
+      console.error('Error loading episode modal:', error);
     }
   }
 
-  selectEpisode(tvShowId, seasonNumber, episodeNumber) {
-    // Update progress in localStorage
-    const storedData = JSON.parse(localStorage.getItem('vidLinkProgress') || '{}');
-    
-    if (!storedData[tvShowId]) {
-      storedData[tvShowId] = {
-        id: tvShowId,
-        type: 'tv',
-        last_season_watched: seasonNumber.toString(),
-        last_episode_watched: episodeNumber.toString(),
-        show_progress: {}
-      };
-    }
+  generateEpisodesList(episodes, fallbackImage) {
+    if (!episodes || !episodes.length) return '';
 
-    const episodeKey = `s${seasonNumber}e${episodeNumber}`;
-    storedData[tvShowId].show_progress[episodeKey] = {
-      season: seasonNumber.toString(),
-      episode: episodeNumber.toString(),
-      progress: {
-        watched: 0,
-        duration: 0
-      },
-      last_updated: Date.now()
-    };
+    return `
+      <div class="grid gap-4">
+        ${episodes.map(episode => {
+          const stillPath = episode.still_path 
+            ? `${API_CONFIG.imageBaseUrl}/${API_CONFIG.imageSizes.backdrop.small}${episode.still_path}`
+            : fallbackImage 
+              ? `${API_CONFIG.imageBaseUrl}/${API_CONFIG.imageSizes.backdrop.small}${fallbackImage}`
+              : '/placeholder.jpg';
+          
+          return `
+            <div class="episode-item bg-[#1a1a1a] rounded-lg overflow-hidden hover:bg-[#262626] transition-colors cursor-pointer"
+                 data-episode="${episode.episode_number}">
+              <div class="flex items-center p-4">
+                <div class="w-32 h-20 bg-gray-800 rounded overflow-hidden flex-shrink-0">
+                  <img src="${stillPath}" 
+                       alt="Episode ${episode.episode_number}" 
+                       class="w-full h-full object-cover"
+                       onerror="this.onerror=null; this.src='/placeholder.jpg';">
+                </div>
+                <div class="ml-4 flex-1">
+                  <div class="flex justify-between items-start">
+                    <div class="text-lg font-medium">Episode ${episode.episode_number}: ${episode.name || `Episode ${episode.episode_number}`}</div>
+                    <div class="text-sm text-gray-400">${episode.runtime || 0} min</div>
+                  </div>
+                  <p class="text-sm text-gray-400 mt-1 line-clamp-2">${episode.overview || 'No description available'}</p>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
 
-    localStorage.setItem('vidLinkProgress', JSON.stringify(storedData));
+  setupEpisodeClickHandlers(media) {
+    const episodeItems = this.modal.querySelectorAll('.episode-item');
+    const seasonButtons = this.modal.querySelectorAll('[data-season]');
+    const activeSeason = Array.from(seasonButtons).find(btn => 
+      btn.classList.contains('bg-[#333333]')
+    );
 
-    // Update UI
-    const selectEpisodeButton = dom.$('#selectEpisodeButton');
-    if (selectEpisodeButton) {
-      selectEpisodeButton.innerHTML = `<i class="fas fa-list mr-2"></i>Selected: S${seasonNumber}E${episodeNumber}`;
-    }
-
-    this.hide();
+    episodeItems.forEach(item => {
+      dom.on(item, 'click', (e) => {
+        e.stopPropagation(); // Prevent event bubbling
+        const selectedSeason = parseInt(activeSeason.dataset.season);
+        const selectedEpisode = parseInt(item.dataset.episode);
+        this.saveProgress(media.id, selectedSeason, selectedEpisode);
+        this.mediaPlayer.displayMedia(media, 'tv');
+        this.hide();
+      });
+    });
   }
 
   hide() {
     if (this.modal) {
-      this.modal.classList.add('hidden');
+      this.modal.classList.remove('active');
+    }
+  }
+
+  saveProgress(mediaId, season, episode) {
+    try {
+      const storedData = JSON.parse(localStorage.getItem('vidLinkProgress') || '{}');
+      storedData[mediaId] = {
+        type: 'tv',
+        last_season_watched: season,
+        last_episode_watched: episode,
+        timestamp: Date.now()
+      };
+      localStorage.setItem('vidLinkProgress', JSON.stringify(storedData));
+    } catch (error) {
+      console.error('Error saving progress:', error);
     }
   }
 }

@@ -223,6 +223,12 @@ export class MediaDetails {
     const selectEpisodeButton = dom.$("#selectEpisodeButton");
     const orientationLockToggle = dom.$("#orientationLockToggle");
     const shareButton = dom.$("#shareButton");
+    const autoFullscreenContainer = dom.$("#autoFullscreenToggle")?.parentElement;
+
+    // Remove autofullscreen toggle on mobile
+    if (window.innerWidth <= 768 && autoFullscreenContainer) {
+      autoFullscreenContainer.remove();
+    }
 
     if (playButton) {
       dom.on(playButton, "click", () => {
@@ -310,5 +316,13 @@ export class MediaDetails {
         }
       });
     }
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      const autoFullscreenContainer = dom.$("#autoFullscreenToggle")?.parentElement;
+      if (window.innerWidth <= 768 && autoFullscreenContainer) {
+        autoFullscreenContainer.remove();
+      }
+    });
   }
 }

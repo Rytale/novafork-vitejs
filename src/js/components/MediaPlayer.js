@@ -395,8 +395,13 @@ export class MediaPlayer {
           src="${embedUrl}" 
           id="videoIframe"
           class="w-full h-[600px]" 
-          allowfullscreen 
-          loading="lazy">
+          allowfullscreen="true"
+          webkitallowfullscreen="true" 
+          mozallowfullscreen="true"
+          allow="fullscreen; autoplay; encrypted-media; picture-in-picture"
+          loading="lazy"
+          playsinline
+          webkit-playsinline>
         </iframe>
       `;
 
@@ -407,6 +412,16 @@ export class MediaPlayer {
       }
 
       const iframe = dom.$("#videoIframe");
+
+      // Add touch event listener for mobile
+      iframe.addEventListener(
+        "touchend",
+        () => {
+          this.attemptFullscreenAndLockOrientation(iframe);
+        },
+        { once: true }
+      );
+
       const videoLoaded = await this.checkVideoLoad(iframe);
 
       if (!videoLoaded) {
@@ -441,38 +456,83 @@ export class MediaPlayer {
 
     const orientationLockEnabled =
       localStorage.getItem("orientationLock") === "true";
+
+    // Check if device is mobile
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    // Only handle orientation lock on mobile devices
+    if (isMobileDevice) {
+      if (orientationLockEnabled) {
+        if (screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock("landscape").catch((err) => {
+            console.warn("Orientation lock failed:", err);
+          });
+        } else if (screen.lockOrientation) {
+          screen.lockOrientation("landscape").catch((err) => {
+            console.warn("Legacy orientation lock failed:", err);
+          });
+        }
+      }
+      return; // Skip fullscreen on mobile
+    }
+
+    // Handle fullscreen only on desktop
     const autoFullscreenEnabled =
       dom.$("#autoFullscreenToggle")?.checked ?? true;
 
-    if (
-      orientationLockEnabled &&
-      screen.orientation &&
-      screen.orientation.lock
-    ) {
-      screen.orientation.lock("landscape").catch((err) => {
-        console.warn("Orientation lock failed:", err);
+    if (autoFullscreenEnabled) {
+      element.addEventListener('load', () => {
+        try {
+          const iframeDoc = element.contentDocument || element.contentWindow.document;
+          const videoElement = iframeDoc.querySelector('video');
+          
+          if (videoElement) {
+            this.requestFullscreen(videoElement);
+          } else {
+            this.requestFullscreen(element);
+          }
+        } catch (e) {
+          this.requestFullscreen(element);
+        }
       });
     }
+  }
 
-    if (autoFullscreenEnabled) {
-      if (element.requestFullscreen) {
-        element.requestFullscreen().catch((err) => {
-          console.warn("Fullscreen request failed:", err);
-        });
-      } else if (element.webkitRequestFullscreen) {
-        element.webkitRequestFullscreen().catch((err) => {
-          console.warn("Webkit fullscreen request failed:", err);
-        });
-      } else if (element.mozRequestFullScreen) {
-        element.mozRequestFullScreen().catch((err) => {
-          console.warn("Mozilla fullscreen request failed:", err);
-        });
-      } else if (element.msRequestFullscreen) {
-        element.msRequestFullscreen().catch((err) => {
-          console.warn("MS fullscreen request failed:", err);
-        });
+  requestFullscreen(element) {
+    // Try all known fullscreen methods
+    const fullscreenMethods = [
+      "requestFullscreen",
+      "webkitRequestFullscreen",
+      "webkitEnterFullscreen", // iOS Safari
+      "mozRequestFullScreen",
+      "msRequestFullscreen",
+    ];
+
+    const tryNextMethod = (index = 0) => {
+      if (index >= fullscreenMethods.length) {
+        console.warn("Fullscreen request failed: No supported method found");
+        return;
       }
-    }
+
+      const method = fullscreenMethods[index];
+      if (element[method]) {
+        element[method]()
+          .then(() => {
+            console.log("Fullscreen enabled successfully");
+          })
+          .catch((err) => {
+            console.warn(`Fullscreen request failed with ${method}:`, err);
+            // Try next method
+            tryNextMethod(index + 1);
+          });
+      } else {
+        // Method not available, try next
+        tryNextMethod(index + 1);
+      }
+    };
+
+    // Start trying methods
+    tryNextMethod();
   }
 
   setupOrientationLock() {
@@ -486,6 +546,22 @@ export class MediaPlayer {
 
       dom.on(orientationLockToggle, "change", (event) => {
         localStorage.setItem("orientationLock", event.target.checked);
+
+        // Immediately try to lock orientation if enabled
+        if (event.target.checked) {
+          if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock("landscape").catch(console.warn);
+          } else if (screen.lockOrientation) {
+            screen.lockOrientation("landscape").catch(console.warn);
+          }
+        } else {
+          // Unlock orientation
+          if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
+          } else if (screen.unlockOrientation) {
+            screen.unlockOrientation();
+          }
+        }
       });
     }
 
@@ -496,6 +572,25 @@ export class MediaPlayer {
 
       dom.on(autoFullscreenToggle, "change", (event) => {
         localStorage.setItem("autoFullscreen", event.target.checked);
+
+        // If enabled, try to enter fullscreen immediately
+        if (event.target.checked) {
+          const videoIframe = dom.$("#videoIframe");
+          if (videoIframe) {
+            this.attemptFullscreenAndLockOrientation(videoIframe);
+          }
+        } else {
+          // Exit fullscreen if it's active
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+          } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+          }
+        }
       });
     }
   }

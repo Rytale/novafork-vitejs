@@ -1,3 +1,10 @@
+/* Hide autofullscreen toggle container on mobile */
+@media (max-width: 768px) {
+  .flex.items-center.justify-between.p-2.rounded-lg.bg-gray-800:has(#autoFullscreenToggle) {
+    display: none !important;
+  }
+}
+
 /* Prevent overscroll white background */
 html {
   background-color: black;

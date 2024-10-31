@@ -180,7 +180,7 @@ export class App {
                 <img src="https://image.tmdb.org/t/p/w92${media.poster_path}" 
                      alt="${title}" 
                      class="w-12 h-16 object-cover rounded mr-3"
-                     onerror="this.src='placeholder.jpg'">
+                     onerror="this.src='placeholder.jpeg'">
                 <div>
                   <div class="font-semibold">${title}</div>
                   <div class="text-sm text-gray-400">${year}</div>
@@ -214,6 +214,7 @@ export class App {
   async handleSearch() {
     const searchInput = dom.$("#searchInput");
     const searchSuggestions = dom.$("#searchSuggestions");
+    const popularMedia = dom.$("#popularMedia");
 
     if (!searchInput || !searchSuggestions) return;
 
@@ -259,7 +260,7 @@ export class App {
 
       // Keep trending media visible
       const popularMedia = dom.$("#popularMedia");
-      if (popularMedia) {
+    if (popularMedia) {
         popularMedia.style.display = "grid";
       }
     } catch (error) {
@@ -368,6 +369,16 @@ export class App {
 
         // Display new results
         await this.mediaGrid.displayMedia(filteredResults, this.mediaType);
+
+        // After results are loaded, scroll to the media container if this was triggered by a search
+        if (this.searchQuery && popularMedia) {
+          setTimeout(() => {
+            popularMedia.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'start'
+            });
+          }, 100); // Small delay to ensure content is rendered
+        }
       }
 
       // Update pagination buttons

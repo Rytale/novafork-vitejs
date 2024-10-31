@@ -183,7 +183,6 @@ class ApiService {
     isStreamingAvailable,
     isDigitalRelease,
     hasFutureRelease,
-   
   }) {
     if (isInTheaters && !isStreamingAvailable && !isDigitalRelease) {
       return "Cam";
@@ -230,22 +229,27 @@ class ApiService {
     });
   }
 
-  async getMediaByCategory(category, type = "movie", page = 1, withGenres = []) {
+  async getMediaByCategory(
+    category,
+    type = "movie",
+    page = 1,
+    withGenres = []
+  ) {
     if (type === "all") {
       // Get both movies and TV shows
       const [movieResults, tvResults] = await Promise.all([
         this.getMediaByCategory(category, "movie", page, withGenres),
-        this.getMediaByCategory(category, "tv", page, withGenres)
+        this.getMediaByCategory(category, "tv", page, withGenres),
       ]);
 
       // Add media_type to each result
-      const moviesWithType = movieResults.results.map(movie => ({
+      const moviesWithType = movieResults.results.map((movie) => ({
         ...movie,
-        media_type: 'movie'
+        media_type: "movie",
       }));
-      const tvWithType = tvResults.results.map(tv => ({
+      const tvWithType = tvResults.results.map((tv) => ({
         ...tv,
-        media_type: 'tv'
+        media_type: "tv",
       }));
 
       // Combine and sort results by popularity
@@ -253,7 +257,10 @@ class ApiService {
         results: [...moviesWithType, ...tvWithType]
           .sort((a, b) => b.popularity - a.popularity)
           .slice(0, 20), // Limit to 20 items per page
-        total_pages: Math.max(movieResults.total_pages || 1, tvResults.total_pages || 1)
+        total_pages: Math.max(
+          movieResults.total_pages || 1,
+          tvResults.total_pages || 1
+        ),
       };
     }
 
@@ -262,11 +269,11 @@ class ApiService {
       const params = {
         language: "en-US",
         sort_by: "popularity.desc",
-        with_genres: withGenres.join(','),
+        with_genres: withGenres.join(","),
         include_adult: false,
         include_video: false,
         vote_count_gte: 10,
-        page
+        page,
       };
 
       // Add category-specific parameters
@@ -275,15 +282,17 @@ class ApiService {
           const today = new Date();
           const threeMonthsFromNow = new Date();
           threeMonthsFromNow.setMonth(today.getMonth() + 3);
-          params.release_date_gte = today.toISOString().split('T')[0];
-          params.release_date_lte = threeMonthsFromNow.toISOString().split('T')[0];
+          params.release_date_gte = today.toISOString().split("T")[0];
+          params.release_date_lte = threeMonthsFromNow
+            .toISOString()
+            .split("T")[0];
           params.vote_count_gte = 0;
           break;
         case "now_playing":
           const oneMonthAgo = new Date();
           oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-          params.release_date_gte = oneMonthAgo.toISOString().split('T')[0];
-          params.release_date_lte = new Date().toISOString().split('T')[0];
+          params.release_date_gte = oneMonthAgo.toISOString().split("T")[0];
+          params.release_date_lte = new Date().toISOString().split("T")[0];
           break;
         case "top_rated":
           params.sort_by = "vote_average.desc";
@@ -296,13 +305,13 @@ class ApiService {
       if (type === "tv") {
         delete params.release_date_gte;
         delete params.release_date_lte;
-        
+
         switch (category) {
           case "on_the_air":
-            params.air_date_gte = new Date().toISOString().split('T')[0];
+            params.air_date_gte = new Date().toISOString().split("T")[0];
             break;
           case "airing_today":
-            const today = new Date().toISOString().split('T')[0];
+            const today = new Date().toISOString().split("T")[0];
             params.air_date_gte = today;
             params.air_date_lte = today;
             break;
@@ -310,11 +319,11 @@ class ApiService {
       }
 
       const results = await this.fetchFromTMDB(`/discover/${type}`, params);
-      
+
       // Add media_type to each result
-      results.results = results.results.map(item => ({
+      results.results = results.results.map((item) => ({
         ...item,
-        media_type: type
+        media_type: type,
       }));
 
       return results;
@@ -362,11 +371,11 @@ class ApiService {
       page,
       language: "en-US",
     });
-    
+
     // Add media_type to each result
-    results.results = results.results.map(item => ({
+    results.results = results.results.map((item) => ({
       ...item,
-      media_type: type
+      media_type: type,
     }));
 
     return results;

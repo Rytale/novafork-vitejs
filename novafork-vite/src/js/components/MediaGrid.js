@@ -52,7 +52,27 @@ export class MediaGrid {
     this.container.innerHTML = placeholders;
   }
 
-  async displayMedia(mediaList, mediaType) {
+  determineMediaType(media) {
+    // First check explicit media_type
+    if (media.media_type === 'movie' || media.media_type === 'tv') {
+      return media.media_type;
+    }
+    
+    // Then check for movie-specific properties
+    if (media.title && media.release_date) {
+      return 'movie';
+    }
+    
+    // Then check for TV-specific properties
+    if (media.name && (media.first_air_date || media.episode_run_time)) {
+      return 'tv';
+    }
+    
+    // If no clear indicators, use the provided mediaType or default to movie
+    return media.media_type || 'movie';
+  }
+
+  async displayMedia(mediaList, defaultMediaType) {
     if (!mediaList || !mediaList.length) {
       this.container.innerHTML =
         '<p class="text-center text-gray-400">No results found</p>';
@@ -66,19 +86,18 @@ export class MediaGrid {
     this.showLoadingState();
 
     // Get release types for all media items concurrently
-    const releasePromises = mediaList.map((media) =>
-      apiService.getReleaseType(media.id, media.media_type || mediaType)
-    );
+    const releasePromises = mediaList.map((media) => {
+      const mediaType = this.determineMediaType(media);
+      return apiService.getReleaseType(media.id, mediaType);
+    });
+
     const releaseTypes = await Promise.all(releasePromises);
 
     const mediaCards = mediaList
-      .map((media, index) =>
-        this.createMediaCard(
-          media,
-          media.media_type || mediaType,
-          releaseTypes[index]
-        )
-      )
+      .map((media, index) => {
+        const mediaType = this.determineMediaType(media);
+        return this.createMediaCard(media, mediaType, releaseTypes[index]);
+      })
       .join("");
 
     // Create a temporary container
@@ -122,7 +141,7 @@ export class MediaGrid {
       : "No overview available";
     const posterPath = media.poster_path
       ? `${API_CONFIG.imageBaseUrl}/${API_CONFIG.imageSizes.poster.large}${media.poster_path}`
-      : "placeholder.jpg";
+      : "placeholder.jpeg";
     const popularity = media.popularity ? media.popularity.toFixed(1) : "N/A";
     const voteCount = media.vote_count
       ? media.vote_count.toLocaleString()
@@ -137,7 +156,7 @@ export class MediaGrid {
           src="${posterPath}" 
           alt="${title}" 
           class="w-full h-[300px] object-cover"
-          onerror="this.src='placeholder.jpg'">
+          onerror="this.src='placeholder.jpeg'">
         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent sm:opacity-0 opacity-100 sm:hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-end">
           <h3 class="text-lg font-bold text-white mb-2">${title}</h3>
           <p class="text-sm text-gray-300 mb-2">${

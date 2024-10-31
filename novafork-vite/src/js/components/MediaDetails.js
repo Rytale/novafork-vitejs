@@ -64,11 +64,11 @@ export class MediaDetails {
           <img src="${
             actor.profile_path
               ? "https://image.tmdb.org/t/p/w500" + actor.profile_path
-              : "/placeholder-actor.jpg"
+              : "/placeholder-actor.jpeg"
           }" 
                alt="${actor.name}" 
                class="w-full h-full object-cover"
-               onerror="this.src='/placeholder-actor.jpg';">
+               onerror="this.src='/placeholder-actor.jpeg';">
         </div>
         <p class="text-white font-semibold text-sm truncate">${actor.name}</p>
         <p class="text-gray-400 text-xs truncate">${actor.character}</p>
@@ -136,9 +136,14 @@ export class MediaDetails {
       // Show the section
       selectedMediaSection.classList.remove("hidden");
 
+      // Handle null poster path
+      const posterPath = media.poster_path 
+        ? `https://image.tmdb.org/t/p/original${media.poster_path}`
+        : '/placeholder.jpeg';
+
       // Update the content
       const populatedTemplate = this.template
-        .replace(/{{poster_path}}/g, media.poster_path)
+        .replace(/https:\/\/image\.tmdb\.org\/t\/p\/original{{poster_path}}/g, posterPath)
         .replace(/{{title_or_name}}/g, media.title || media.name)
         .replace(/{{release_date_or_first_air_date}}/g, releaseDate)
         .replace(/{{overview}}/g, media.overview || "No overview available.")
@@ -160,6 +165,14 @@ export class MediaDetails {
         .replace(/{{production_companies}}/g, productionCompanies);
 
       selectedMovie.innerHTML = populatedTemplate;
+
+      // Add error handler for poster image
+      const posterImg = selectedMovie.querySelector('#poster');
+      if (posterImg) {
+        posterImg.onerror = function() {
+          this.src = '/placeholder.jpeg';
+        };
+      }
 
       // Setup event listeners
       this.setupEventListeners(media, mediaType);

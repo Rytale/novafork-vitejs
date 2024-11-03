@@ -457,8 +457,10 @@ export class MediaPlayer {
     const orientationLockEnabled =
       localStorage.getItem("orientationLock") === "true";
 
-    // Check if device is mobile
-    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    // Check if device supports orientation
+    const isMobileDevice =
+      "orientation" in window ||
+      ("screen" in window && "orientation" in window.screen);
 
     // Only handle orientation lock on mobile devices
     if (isMobileDevice) {
@@ -481,11 +483,12 @@ export class MediaPlayer {
       dom.$("#autoFullscreenToggle")?.checked ?? true;
 
     if (autoFullscreenEnabled) {
-      element.addEventListener('load', () => {
+      element.addEventListener("load", () => {
         try {
-          const iframeDoc = element.contentDocument || element.contentWindow.document;
-          const videoElement = iframeDoc.querySelector('video');
-          
+          const iframeDoc =
+            element.contentDocument || element.contentWindow.document;
+          const videoElement = iframeDoc.querySelector("video");
+
           if (videoElement) {
             this.requestFullscreen(videoElement);
           } else {

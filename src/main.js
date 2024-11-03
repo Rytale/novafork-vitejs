@@ -1,12 +1,8 @@
 import "./styles/main.css";
 import { App } from "./js/App";
 
-
-
 // Initialize protections and app
 window.addEventListener("load", () => {
-
-
   const app = new App();
   app.initializeApp().catch((error) => {
     // Suppress error logging in production

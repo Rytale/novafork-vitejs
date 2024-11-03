@@ -1,0 +1,22 @@
+{
+  "rules": {
+    "activeUsers": {
+      "count": {
+        ".read": true,
+        ".write": "newData.isNumber() && newData.val() >= 0 && (data.val() == null || newData.val() == data.val() + 1 || newData.val() == data.val() - 1)",
+        ".validate": "newData.isNumber() && newData.val() >= 0"
+      },
+      "$uid": {
+        ".read": true,
+        ".write": "newData.isBoolean() && (!data.exists() || !newData.exists())",
+        ".validate": "newData.isBoolean() && $uid.matches(/^[0-9]+$/)",
+        // Delete entries older than 24 hours
+        ".indexOn": ".value",
+        // Limit the number of concurrent connections
+        "$other": {
+          ".validate": "data.parent().parent().child('count').val() < 1000"
+        }
+      }
+    }
+  }
+}

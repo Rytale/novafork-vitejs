@@ -4,7 +4,6 @@ import { DEV_CONFIG } from "../api/config";
 export class MediaPlayer {
   constructor() {
     this.selectedProvider = "vidbinge";
-    this.currentProviderIndex = 0;
     this.providerPriority = [
       // Best providers first
       "vidbinge",
@@ -124,6 +123,8 @@ export class MediaPlayer {
         return `https://multiembed.mov/directstream.php?video_id=${mediaId}&tmdb=1`;
       case "vidsrcicu":
         return `https://vidsrc.icu/embed/movie/${mediaId}`;
+      case "filmxy":
+        return `https://filmxy.vip/embed/${mediaId}`;
       case "cinescrape":
         try {
           const randomDelay =
@@ -208,6 +209,8 @@ export class MediaPlayer {
         return `https://multiembed.mov/directstream.php?video_id=${mediaId}&tmdb=1&s=${seasonId}&e=${episodeId}`;
       case "vidsrcicu":
         return `https://vidsrc.icu/embed/tv/${mediaId}/${seasonId}/${episodeId}`;
+      case "filmxy":
+        return `https://filmxy.vip/embed/${mediaId}/${seasonId}-${episodeId}`;
       case "cinescrape":
         try {
           const randomDelay =
@@ -295,19 +298,6 @@ export class MediaPlayer {
     }
   }
 
-  async tryNextProvider(media, mediaType) {
-    this.currentProviderIndex++;
-    if (this.currentProviderIndex >= this.providerPriority.length) {
-      this.currentProviderIndex = 0;
-      throw new Error("All providers failed");
-    }
-    this.selectedProvider = this.providerPriority[this.currentProviderIndex];
-    const providerName =
-      this.providerNames[this.selectedProvider] || this.selectedProvider;
-    this.showStatus(`Source not found, trying ${providerName}...`);
-    await this.displayMedia(media, mediaType, true);
-  }
-
   async checkVideoLoad(iframe) {
     return new Promise((resolve) => {
       const timeout = setTimeout(() => {
@@ -346,7 +336,7 @@ export class MediaPlayer {
     });
   }
 
-  async displayMedia(media, mediaType, isRetry = false) {
+  async displayMedia(media, mediaType) {
     const videoPlayer = dom.$("#videoPlayer");
     const selectedSection = dom.$("#selectedMediaSection");
     const providerSelect = dom.$("#providerSelect");
@@ -358,9 +348,7 @@ export class MediaPlayer {
       const providerName = this.providerNames[provider] || provider;
       let embedUrl;
 
-      if (!isRetry) {
-        this.showStatus(`Loading from ${providerName}...`);
-      }
+      this.showStatus(`Loading from ${providerName}...`);
 
       if (mediaType === "movie") {
         embedUrl = await this.getMovieEmbedUrl(media.id, provider);
@@ -380,7 +368,6 @@ export class MediaPlayer {
       }
 
       if (
-        !isRetry &&
         DEV_CONFIG.showLoadingAnimation &&
         DEV_CONFIG.loadingProviders.includes(provider)
       ) {
@@ -425,10 +412,7 @@ export class MediaPlayer {
       const videoLoaded = await this.checkVideoLoad(iframe);
 
       if (!videoLoaded) {
-        console.log(
-          `Provider ${provider} failed to load video, trying next provider...`
-        );
-        await this.tryNextProvider(media, mediaType);
+        this.showStatus("Source not available", true);
         return;
       }
 
@@ -436,18 +420,8 @@ export class MediaPlayer {
       this.attemptFullscreenAndLockOrientation(iframe);
     } catch (error) {
       console.error("Error displaying media:", error);
-      if (!isRetry) {
-        try {
-          await this.tryNextProvider(media, mediaType);
-        } catch (e) {
-          console.error("All providers failed:", e);
-          this.showStatus("No working sources found", true);
-          selectedSection.classList.add("hidden");
-        }
-      } else {
-        this.showStatus("No working sources found", true);
-        selectedSection.classList.add("hidden");
-      }
+      this.showStatus("Source not available", true);
+      selectedSection.classList.add("hidden");
     }
   }
 

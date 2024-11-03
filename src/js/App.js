@@ -5,6 +5,7 @@ import { BitcoinPopup } from "./components/BitcoinPopup";
 import { EpisodeModal } from "./components/EpisodeModal";
 import { MediaGrid } from "./components/MediaGrid";
 import { AdvancedFilters } from "./components/AdvancedFilters";
+import { UserTracker } from "./components/UserTracker";
 import { apiService } from "./api/apiService";
 import { dom } from "./utils/helpers";
 
@@ -18,6 +19,7 @@ export class App {
     this.bitcoinPopup = new BitcoinPopup();
     this.episodeModal = new EpisodeModal(this.mediaPlayer);
     this.advancedFilters = new AdvancedFilters();
+    this.userTracker = null; // Initialize after Firebase is ready
     this.mediaGrid = null; // Initialize later when DOM is ready
     this.currentPage = 1;
     this.totalPages = 1;
@@ -57,6 +59,9 @@ export class App {
     try {
       // Initialize MediaGrid after DOM is ready
       this.mediaGrid = new MediaGrid();
+
+      // Initialize UserTracker
+      this.userTracker = new UserTracker();
 
       this.setupEventListeners();
       this.mediaPlayer.setupOrientationLock();
